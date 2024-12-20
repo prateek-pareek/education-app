@@ -1,71 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { LoginManager, AccessToken,Settings } from 'react-native-fbsdk-next';
-import { auth, googleProvider, facebookProvider } from '../../../../firebaseConfig';  // import firebase config
-import { signInWithEmailAndPassword, signInWithCredential } from 'firebase/auth';  // import firebase auth methods
+import React, {useState, useEffect} from 'react'
+import {
+  View,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from 'react-native'
+import {GoogleSignin} from '@react-native-google-signin/google-signin'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import {LoginManager, AccessToken} from 'react-native-fbsdk-next'
+import {
+  auth,
+  googleProvider,
+  facebookProvider,
+} from '../../../../firebaseConfig'
+import {signInWithEmailAndPassword, signInWithCredential} from 'firebase/auth'
 
-const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordVisible, setPasswordVisible] = useState(false);
+const LoginScreen = ({navigation}) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordVisible, setPasswordVisible] = useState(false)
 
   // Configure Google Sign-In
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: 'YOUR_GOOGLE_WEB_CLIENT_ID',  // Replace with your actual Web Client ID from Firebase Console
-    });
-  }, []);
-  // useEffect(() => {
-  //   Settings.initializeSDK(); // Ensure Facebook SDK is initialized
-  // }, []);
+      webClientId:
+        '477322964738-t8f6a1l19m9nnvmcjvv8mra2uo1ughs1.apps.googleusercontent.com',
+    })
+  }, [])
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert('Login Success', `Logged in with email: ${email}`);
+      await signInWithEmailAndPassword(auth, email, password)
+      Alert.alert('Login Success', `Logged in with email: ${email}`)
     } catch (error) {
-      Alert.alert('Login Failed', error.message);
+      Alert.alert('Login Failed', error.message)
     }
-  };
+  }
+
 
   const handleGoogleLogin = async () => {
     try {
-      const { idToken } = await GoogleSignin.signIn();  // Sign in with Google
-      const googleCredential = googleProvider.credential(idToken);  // Get credential
-      await signInWithCredential(auth, googleCredential);  // Firebase login
-      Alert.alert("Google Login", "Logged in successfully via Google");
+      const {idToken} = await GoogleSignin.signIn() // Google sign-in
+      const googleCredential = googleProvider.credential(idToken) // Firebase Google credential
+      await signInWithCredential(auth, googleCredential) // Firebase login
+      Alert.alert('Google Login', 'Logged in successfully via Google')
     } catch (error) {
-      Alert.alert("Google Login Failed", error.message);
+      Alert.alert('Google Login Failed', error.message)
     }
-  };
+  }
 
+  // Handle Facebook login
   const handleFacebookLogin = async () => {
     try {
-      const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);  // Facebook login
+      const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
       if (result.isCancelled) {
-        Alert.alert('Login canceled');
+        Alert.alert('Login Canceled', 'User canceled the login process.');
         return;
       }
-
-      const data = await AccessToken.getCurrentAccessToken();  // Get Facebook access token
-      if (!data) {
-        Alert.alert('Error', 'Something went wrong obtaining access token');
+  
+      const accessToken = await AccessToken.getCurrentAccessToken();
+      if (!accessToken) {
+        Alert.alert('Error', 'Could not obtain access token.');
         return;
       }
-
-      const facebookCredential = facebookProvider.credential(data.accessToken);  // Get Facebook credential
-      await signInWithCredential(auth, facebookCredential);  // Firebase login
-      Alert.alert('Facebook Login', 'Logged in successfully via Facebook');
+  
+      // Use the access token to create a Facebook credential for Firebase
+      const facebookCredential = facebookProvider.credential(accessToken.accessToken);
+      await signInWithCredential(auth, facebookCredential);
+      Alert.alert('Login Success', 'Logged in successfully via Facebook!');
     } catch (error) {
-      Alert.alert('Facebook Login Failed', error.message);
+      console.error('Facebook Login Error:', error);
+      Alert.alert('Facebook Login Failed', error.message || 'Something went wrong.');
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <Text style={styles.header}>Log In</Text>
 
       {/* Email Input */}
@@ -73,28 +85,30 @@ const LoginScreen = ({ navigation }) => {
         <Text style={styles.label}>Your Email</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your email"
-          keyboardType="email-address"
+          placeholder='Enter your email'
+          keyboardType='email-address'
           value={email}
           onChangeText={setEmail}
         />
       </View>
 
-      {/* Password Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Password</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your password"
+          placeholder='Enter your password'
           secureTextEntry={!passwordVisible}
           value={password}
           onChangeText={setPassword}
         />
         <TouchableOpacity
           onPress={() => setPasswordVisible(!passwordVisible)}
-          style={styles.eyeIcon}
-        >
-          <Icon name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="#aaa" />
+          style={styles.eyeIcon}>
+          <Icon
+            name={passwordVisible ? 'eye-off' : 'eye'}
+            size={20}
+            color='#aaa'
+          />
         </TouchableOpacity>
       </View>
 
@@ -111,7 +125,9 @@ const LoginScreen = ({ navigation }) => {
       {/* Sign Up Link */}
       <Text style={styles.signupText}>
         Don’t have an account?{' '}
-        <Text style={styles.signupLink} onPress={() => navigation.navigate('SignUp')}>
+        <Text
+          style={styles.signupLink}
+          onPress={() => navigation.navigate('SignUp')}>
           Sign up
         </Text>
       </Text>
@@ -119,16 +135,20 @@ const LoginScreen = ({ navigation }) => {
       {/* Social Login Section */}
       <Text style={styles.orText}>Or login with</Text>
       <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin}>
-          <Icon name="google" size={20} color="#EA4335" />
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleGoogleLogin}>
+          <Icon name='google' size={20} color='#EA4335' />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton} onPress={handleFacebookLogin}>
-          <Icon name="facebook" size={20} color="#1877F2" />
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleFacebookLogin}>
+          <Icon name='facebook' size={20} color='#1877F2' />
         </TouchableOpacity>
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -215,6 +235,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
   },
-});
+})
 
-export default LoginScreen;
+export default LoginScreen

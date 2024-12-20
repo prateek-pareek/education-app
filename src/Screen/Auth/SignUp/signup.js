@@ -1,14 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'; // Import Firebase authentication methods
-import { auth } from '../../../../firebaseConfig'; // Firebase configuration
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithCredential,
+} from 'firebase/auth'; 
+import {
+  GoogleSignin,
+} from '@react-native-google-signin/google-signin'; 
+import { LoginManager, AccessToken } from 'react-native-fbsdk-next'; 
+import { auth,googleProvider, facebookProvider} from '../../../../firebaseConfig'; // Firebase configuration
 
 const SignUpScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        '477322964738-t8f6a1l19m9nnvmcjvv8mra2uo1ughs1.apps.googleusercontent.com',
+    });
+  }, []);
 
   const handleSignUp = async () => {
     if (!email || !password) {
@@ -21,13 +36,47 @@ const SignUpScreen = ({ navigation }) => {
     }
 
     try {
-      // Firebase sign-up logic
+      // Firebase email/password sign-up logic
       await createUserWithEmailAndPassword(auth, email, password);
       Alert.alert('Success', `Account created for: ${email}`);
-      // Redirect to login screen after successful signup
       navigation.navigate('Login');
     } catch (error) {
       Alert.alert('Error', error.message);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      const { idToken } = await GoogleSignin.signIn(); // Google sign-in
+      const googleCredential = googleProvider.credential(idToken); // Firebase credential
+      await signInWithCredential(auth, googleCredential); // Firebase sign-up
+      Alert.alert('Success', 'Account created using Google!');
+      navigation.navigate('Login');
+    } catch (error) {
+      Alert.alert('Google Sign-Up Failed', error.message);
+    }
+  };
+
+  const handleFacebookSignUp = async () => {
+    try {
+      const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+      if (result.isCancelled) {
+        Alert.alert('Sign-Up Canceled', 'User canceled the sign-up process.');
+        return;
+      }
+
+      const data = await AccessToken.getCurrentAccessToken();
+      if (!data) {
+        Alert.alert('Error', 'Could not obtain access token.');
+        return;
+      }
+
+      const facebookCredential = facebookProvider.credential(data.accessToken);
+      await signInWithCredential(auth, facebookCredential);
+      Alert.alert('Success', 'Account created using Facebook!');
+      navigation.navigate('Login');
+    } catch (error) {
+      Alert.alert('Facebook Sign-Up Failed', error.message);
     }
   };
 
@@ -91,6 +140,17 @@ const SignUpScreen = ({ navigation }) => {
           Log in
         </Text>
       </Text>
+
+      <Text style={styles.orText}>Or sign up with</Text>
+
+      <View style={styles.socialContainer}>
+        <TouchableOpacity style={styles.socialButton} onPress={handleGoogleSignUp}>
+          <Icon name="google" size={20} color="#EA4335" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.socialButton} onPress={handleFacebookSignUp}>
+          <Icon name="facebook" size={20} color="#1877F2" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -183,6 +243,30 @@ const styles = StyleSheet.create({
   loginLink: {
     color: '#007BFF',
     fontWeight: 'bold',
+  },
+  signUpButton: {
+    backgroundColor: '#4E68E8',
+    height: 48,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  signUpButtonText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  orText: {
+    fontSize: 14,
+    color: '#1C1C1C',
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  socialContainer: {
+    flexDirection: 'row',
+   
+   
   },
 });
 

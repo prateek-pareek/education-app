@@ -72,7 +72,7 @@ const AppNavigator = () => {
 
 const App = () => {
   return (
-    <Login/>
+    <SignUpScreen/>
     // <NavigationContainer>
     //   <AppNavigator />
     // </NavigationContainer>
