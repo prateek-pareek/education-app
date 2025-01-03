@@ -22,7 +22,6 @@ const LoginScreen = ({navigation}) => {
   const [password, setPassword] = useState('')
   const [passwordVisible, setPasswordVisible] = useState(false)
 
-  // Configure Google Sign-In
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
@@ -39,42 +38,46 @@ const LoginScreen = ({navigation}) => {
     }
   }
 
-
   const handleGoogleLogin = async () => {
     try {
-      const {idToken} = await GoogleSignin.signIn() // Google sign-in
-      const googleCredential = googleProvider.credential(idToken) // Firebase Google credential
-      await signInWithCredential(auth, googleCredential) // Firebase login
+      const {idToken} = await GoogleSignin.signIn()
+      const googleCredential = googleProvider.credential(idToken) 
+      await signInWithCredential(auth, googleCredential) 
       Alert.alert('Google Login', 'Logged in successfully via Google')
     } catch (error) {
       Alert.alert('Google Login Failed', error.message)
     }
   }
 
-  // Handle Facebook login
   const handleFacebookLogin = async () => {
     try {
-      const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+      const result = await LoginManager.logInWithPermissions([
+        'public_profile',
+        'email',
+      ])
       if (result.isCancelled) {
-        Alert.alert('Login Canceled', 'User canceled the login process.');
-        return;
+        Alert.alert('Login Canceled', 'User canceled the login process.')
+        return
       }
-  
-      const accessToken = await AccessToken.getCurrentAccessToken();
+
+      const accessToken = await AccessToken.getCurrentAccessToken()
       if (!accessToken) {
-        Alert.alert('Error', 'Could not obtain access token.');
-        return;
+        Alert.alert('Error', 'Could not obtain access token.')
+        return
       }
-  
-      // Use the access token to create a Facebook credential for Firebase
-      const facebookCredential = facebookProvider.credential(accessToken.accessToken);
-      await signInWithCredential(auth, facebookCredential);
-      Alert.alert('Login Success', 'Logged in successfully via Facebook!');
+      const facebookCredential = facebookProvider.credential(
+        accessToken.accessToken,
+      )
+      await signInWithCredential(auth, facebookCredential)
+      Alert.alert('Login Success', 'Logged in successfully via Facebook!')
     } catch (error) {
-      console.error('Facebook Login Error:', error);
-      Alert.alert('Facebook Login Failed', error.message || 'Something went wrong.');
+      console.error('Facebook Login Error:', error)
+      Alert.alert(
+        'Facebook Login Failed',
+        error.message || 'Something went wrong.',
+      )
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -144,6 +147,11 @@ const LoginScreen = ({navigation}) => {
           style={styles.socialButton}
           onPress={handleFacebookLogin}>
           <Icon name='facebook' size={20} color='#1877F2' />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.socialButton}
+          onPress={handleFacebookLogin}>
+          <Icon name='linkedin' size={20} color='#1877F2' />
         </TouchableOpacity>
       </View>
     </View>
