@@ -14,6 +14,7 @@ const BottomTabbar = () => {
           tabBarShowLabel: false,
           tabBarActiveTintColor: Colors.primaryColor,
           tabBarInactiveTintColor: Colors.grey,
+          headerShown: false,
         })}>
         {TabData.map(tab => (
           <Tab.Screen
@@ -28,7 +29,7 @@ const BottomTabbar = () => {
                   size={focused ? tab.size : tab.unFocusSize}
                   color={color}
                 />
-              ),
+              )
             }}
           />
         ))}

@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 18,
     backgroundColor: Colors.white,
+    paddingTop: 40,
   },
   triggerContainer: {
     flexDirection: 'row',

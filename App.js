@@ -9,6 +9,9 @@ import {enableScreens} from 'react-native-screens'
 import Login from './src/Screen/Auth/Login/login'
 import SignUpScreen from './src/Screen/Auth/SignUp/signup'
 import MainScreen from './src/Screen/Home/MainScreen'
+import EditProfileScreen from './src/Screen/accounts/profile'
+import PaymentScreen from './src/Screen/accounts/payment'
+import CourseCard from "./src/Screen/myCourse/courseCard"
 enableScreens()
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
@@ -21,6 +24,9 @@ const AppNavigator = () => {
       <Stack.Screen name='Login' component={Login} />
       <Stack.Screen name='SignUp' component={SignUpScreen} />
       <Stack.Screen name='MainScreen' component={MainScreen} />
+      <Stack.Screen name='EditProfileScreen' component={EditProfileScreen} />
+      <Stack.Screen name='PaymentScreen' component={PaymentScreen} />
+      <Stack.Screen name='CourseCard' component={CourseCard} />
     </Stack.Navigator>
   )
 }

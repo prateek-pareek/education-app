@@ -1,4 +1,7 @@
 import HomeScreen from '../Screen/Home/home'
+import AccountScreen from "../Screen/accounts/accounts"
+import CourseScreen from "../Screen/myCourse/myCourse"
+import NotificationsScreen from "../Screen/Notification/notification"
 
 export const TabData = [
   {
@@ -12,17 +15,17 @@ export const TabData = [
     size: 25,
     unFocusSize: 28,
   },
-  {
-    id: 2,
-    route: HomeScreen,
-    name: 'Friends',
-    activeIconName: 'people-sharp',
-    activeiconType: 'Ionicons',
-    inactiveIconName: 'people-outline',
-    inactiveIconType: 'Ionicons',
-    size: 25,
-    unFocusSize: 25,
-  },
+  // {
+  //   id: 2,
+  //   route: HomeScreen,
+  //   name: 'Friends',
+  //   activeIconName: 'people-sharp',
+  //   activeiconType: 'Ionicons',
+  //   inactiveIconName: 'people-outline',
+  //   inactiveIconType: 'Ionicons',
+  //   size: 25,
+  //   unFocusSize: 25,
+  // },
   {
     id: 3,
     route: HomeScreen,
@@ -36,7 +39,7 @@ export const TabData = [
   },
   {
     id: 4,
-    route: HomeScreen,
+    route: CourseScreen,
     name: 'MarketPlace',
     activeIconName: 'shop',
     activeiconType: 'Entypo',
@@ -47,7 +50,7 @@ export const TabData = [
   },
   {
     id: 5,
-    route: HomeScreen,
+    route: NotificationsScreen,
     name: 'Notification',
     activeIconName: 'notifications',
     activeiconType: 'Ionicons',
@@ -58,7 +61,7 @@ export const TabData = [
   },
   {
     id: 6,
-    route: HomeScreen,
+    route: AccountScreen,
     name: 'Profile',
     activeIconName: 'person',
     activeiconType: 'Ionicons',
