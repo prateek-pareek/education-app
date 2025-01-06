@@ -1,9 +1,10 @@
-import {View, StyleSheet, Image} from 'react-native';
-import React from 'react';
-import {Colors} from '../utils/Colors';
-import PostHeader from './PostHeader';
-import PostFooter from './PostFooter';
-import {PostData} from '../data/PostData';
+import {View, StyleSheet, Image} from 'react-native'
+import React from 'react'
+import {Colors} from '../utils/Colors'
+import PostHeader from './PostHeader'
+import PostFooter from './PostFooter'
+import {PostData} from '../data/PostData'
+import CommentSection from './commentSection'
 
 const Post = () => {
   return (
@@ -16,8 +17,8 @@ const Post = () => {
         </View>
       ))}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   postContainer: {
@@ -28,6 +29,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 250,
   },
-});
+})
 
-export default Post;
+export default Post

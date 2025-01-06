@@ -19,7 +19,7 @@ export const PostData = [
     name: 'John Doe',
     postImg: Post1,
     profileImg: FriendStoryImg1,
-    caption: "Can't stop putting more plants in my home.",
+    caption: "Can't stop putting more plants in my home. 6556876868979879797987987987987979797979879797987987987979879879879798798798798797979797979798798798798797987987979796798689678tuyturyryrfyry",
     date: '2d',
     comments: 23,
     reaction: 180,

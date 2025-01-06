@@ -1,8 +1,8 @@
 import HomeScreen from '../Screen/Home/home'
-import AccountScreen from "../Screen/accounts/accounts"
-import CourseScreen from "../Screen/myCourse/myCourse"
-import NotificationsScreen from "../Screen/Notification/notification"
-
+import AccountScreen from '../Screen/accounts/accounts'
+import CourseScreen from '../Screen/myCourse/myCourse'
+import NotificationsScreen from '../Screen/Notification/notification'
+import LiveStream from '../Screen/LiveStream/liveStream'
 export const TabData = [
   {
     id: 1,
@@ -26,17 +26,17 @@ export const TabData = [
   //   size: 25,
   //   unFocusSize: 25,
   // },
-  {
-    id: 3,
-    route: HomeScreen,
-    name: 'Watch',
-    activeIconName: 'youtube-tv',
-    activeiconType: 'MaterialCommunityIcons',
-    inactiveIconName: 'television-play',
-    inactiveIconType: 'MaterialCommunityIcons',
-    size: 25,
-    unFocusSize: 25,
-  },
+  // {
+  //   id: 3,
+  //   route: LiveStream,
+  //   name: 'Watch',
+  //   activeIconName: 'youtube-tv',
+  //   activeiconType: 'MaterialCommunityIcons',
+  //   inactiveIconName: 'television-play',
+  //   inactiveIconType: 'MaterialCommunityIcons',
+  //   size: 25,
+  //   unFocusSize: 25,
+  // },
   {
     id: 4,
     route: CourseScreen,

@@ -5,8 +5,10 @@ import Shock from '../../public/images/shock.jpeg';
 import Heart from '../../public/images/heart.jpeg';
 import {Colors} from '../utils/Colors';
 import VectorIcon from '../utils/VectorIcon';
+import { useNavigation } from '@react-navigation/native';
 
 const PostFooter = ({data}) => {
+  const navigation=useNavigation()
   return (
     <View style={styles.postFotterContainer}>
       <View style={styles.footerReactionSec}>
@@ -35,7 +37,7 @@ const PostFooter = ({data}) => {
             size={25}
             color={Colors.grey}
           />
-          <Text style={styles.reactionCount}>Comment</Text>
+          <Text style={styles.reactionCount} onPress={()=>{navigation.navigate("CommentScreen")}}>Comment</Text>
         </View>
 
         <View style={styles.row}>
