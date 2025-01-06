@@ -11,7 +11,8 @@
                     "@": "./"
                 }
             }
-        ]
+        ],
+        "react-native-reanimated/plugin"
     ]
     }
     

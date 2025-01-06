@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { Card } from "react-native-elements";
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, {useState} from 'react'
+import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native'
+import {Card} from 'react-native-elements'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import ChatListScreen from './chat'
 
 const notifications = [
   {
@@ -32,16 +33,20 @@ const notifications = [
     time: 'Just now',
     iconColor: '#5C6BC0',
   },
-];
+]
 
 const NotificationsScreen = () => {
-  const [activeTab, setActiveTab] = useState('notification'); // Default active tab is 'notification'
+  const [activeTab, setActiveTab] = useState('notification') // Default active tab is 'notification'
 
-  const renderNotification = ({ item }) => (
+  const renderNotification = ({item}) => (
     <TouchableOpacity onPress={() => console.log('Notification Pressed')}>
       <Card style={styles.notificationCard}>
         <View style={styles.cardContent}>
-          <View style={[styles.iconContainer, { backgroundColor: `${item.iconColor}20` }]}>
+          <View
+            style={[
+              styles.iconContainer,
+              {backgroundColor: `${item.iconColor}20`},
+            ]}>
             <Icon name={item.icon} size={24} color={item.iconColor} />
           </View>
           <View style={styles.textContainer}>
@@ -51,7 +56,7 @@ const NotificationsScreen = () => {
         </View>
       </Card>
     </TouchableOpacity>
-  );
+  )
 
   return (
     <View style={styles.container}>
@@ -60,13 +65,25 @@ const NotificationsScreen = () => {
       {/* Tabs */}
       <View style={styles.tabContainer}>
         <TouchableOpacity onPress={() => setActiveTab('message')}>
-          <Text style={[styles.tabText, activeTab === 'message' && styles.activeTabText]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'message' && styles.activeTabText,
+            ]}>
             Message
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setActiveTab('notification')}>
-          <View style={[styles.activeTab, activeTab === 'notification' && styles.activeTabActive]}>
-            <Text style={[styles.tabText, activeTab === 'notification' && styles.activeTabText]}>
+          <View
+            style={[
+              styles.activeTab,
+              activeTab === 'notification' && styles.activeTabActive,
+            ]}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'notification' && styles.activeTabText,
+              ]}>
               Notification
             </Text>
           </View>
@@ -77,18 +94,16 @@ const NotificationsScreen = () => {
       {activeTab === 'notification' ? (
         <FlatList
           data={notifications}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           renderItem={renderNotification}
           contentContainerStyle={styles.listContainer}
         />
       ) : (
-        <View style={styles.messageContainer}>
-          <Text style={styles.noMessages}>No new messages</Text>
-        </View>
+        <ChatListScreen />
       )}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -107,12 +122,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,  // Reduced bottom margin to bring the tabs closer to content
+    marginBottom: 16, // Reduced bottom margin to bring the tabs closer to content
   },
   tabText: {
     fontSize: 16,
     color: '#C5CEE0',
-    marginHorizontal: 8,  // Reduced horizontal space to bring tabs closer
+    marginHorizontal: 8, // Reduced horizontal space to bring tabs closer
   },
   activeTab: {
     borderBottomWidth: 2,
@@ -170,6 +185,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#8F9BB3',
   },
-});
+})
 
-export default NotificationsScreen;
+export default NotificationsScreen

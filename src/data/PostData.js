@@ -1,17 +1,17 @@
-import Post1 from '../../public/images/post1.jpeg';
-import Post2 from '../../public/images/post2.jpeg';
-import Post3 from '../../public/images/post3.webp';
-import Post4 from '../../public/images/post4.jpeg';
-import Post5 from '../../public/images/post5.jpeg';
-import Post6 from '../../public/images/post6.webp';
-import Post7 from '../../public/images/post8.jpeg';
-import FriendStoryImg1 from '../../public/images/img2.jpeg';
-import FriendStoryImg2 from '../../public/images/img3.jpeg';
-import FriendStoryImg3 from '../../public/images/img4.jpeg';
-import FriendStoryImg4 from '../../public/images/img5.jpeg';
-import FriendStoryImg5 from '../../public/images/img6.jpeg';
-import FriendStoryImg6 from '../../public/images/img7.jpeg';
-import FriendStoryImg7 from '../../public/images/img8.jpeg';
+import Post1 from '../../public/images/post1.jpeg'
+import Post2 from '../../public/images/post2.jpeg'
+import Post3 from '../../public/images/post3.webp'
+import Post4 from '../../public/images/post4.jpeg'
+import Post5 from '../../public/images/post5.jpeg'
+import Post6 from '../../public/images/post6.webp'
+import Post7 from '../../public/images/post8.jpeg'
+import FriendStoryImg1 from '../../public/images/img2.jpeg'
+import FriendStoryImg2 from '../../public/images/img3.jpeg'
+import FriendStoryImg3 from '../../public/images/img4.jpeg'
+import FriendStoryImg4 from '../../public/images/img5.jpeg'
+import FriendStoryImg5 from '../../public/images/img6.jpeg'
+import FriendStoryImg6 from '../../public/images/img7.jpeg'
+import FriendStoryImg7 from '../../public/images/img8.jpeg'
 
 export const PostData = [
   {
@@ -84,4 +84,4 @@ export const PostData = [
     comments: 50,
     reaction: 300,
   },
-];
+]
