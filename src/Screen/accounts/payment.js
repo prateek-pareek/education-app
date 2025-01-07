@@ -12,7 +12,7 @@ const PaymentScreen = () => {
     { type: 'Added', amount: 100, date: '2023-01-03 09:30:00' },
     { type: 'Spent', amount: 20, date: '2023-01-04 18:10:30' },
     { type: 'Added', amount: 200, date: '2023-01-05 11:05:00' },
-  ]);
+  ]); 
 
   const handleAddMoney = () => {
     const amount = parseFloat(amountToAdd);

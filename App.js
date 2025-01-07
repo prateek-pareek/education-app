@@ -30,6 +30,7 @@ import PaymentScreen from './src/Screen/accounts/payment'
 import CourseCard from './src/Screen/myCourse/courseCard'
 import CommentScreen from './src/Screen/Home/coment'
 import {Text, SafeAreaView} from 'react-native'
+import explorer from './src/Screen/accounts/explorer'
 // import ChatListScreen from './src/Screen/Notification/chat'
 // import ChatScreen from './src/Screen/Notification/message'
 // import LiveStream from './src/Screen/LiveStream/liveStream'
@@ -53,6 +54,7 @@ const AppNavigator = () => {
       {/* <Stack.Screen name='chat' component={ChatListScreen} />
       <Stack.Screen name='ChatScreen' component={ChatScreen} /> */}
       {/* <Stack.Screen name='LiveStream' component={LiveStream} /> */}
+      <Stack.Screen name='explorer' component={explorer} />
     </Stack.Navigator>
   )
 }

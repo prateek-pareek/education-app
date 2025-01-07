@@ -1,5 +1,6 @@
 export const Colors = {
-  primaryColor: '#1877F2',
+  // primaryColor: '#1877F2',
+  primaryColor: '#49BBBD',
   white: '#FFFFFF',
   black: '#000000',
   grey: '#3A3A3A',
@@ -11,4 +12,6 @@ export const Colors = {
   textColor: '#26282b',
   textGrey: '#989FA7',
   headerIconGrey: '#606770',
+  blue: '4F63AC',
+  primary:'#49BBBD'
 };
