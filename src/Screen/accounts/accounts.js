@@ -80,6 +80,7 @@ const AccountScreen = ({ navigation }) => {
         <MenuItem title="Favourite" />
         <MenuItem title="Edit Account" route="EditProfileScreen" navigation={navigation} />
         <MenuItem title="Payments" route="PaymentScreen" navigation={navigation} />
+        <MenuItem title="SubScriptions" route="GetPremiumScreen" navigation={navigation} />
         <MenuItem title="Settings and Privacy" />
         <MenuItem title="Help" />
       </View>

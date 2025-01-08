@@ -1,8 +1,11 @@
 import HomeScreen from '../Screen/Home/home'
 import AccountScreen from '../Screen/accounts/accounts'
-import CourseScreen from '../Screen/myCourse/myCourse'
+import CourseScreen from '../Screen/explore/courseHome'
 import NotificationsScreen from '../Screen/Notification/notification'
 import LiveStream from '../Screen/LiveStream/liveStream'
+import MyCoursesScreen from '../Screen/myCourse/myCourse'
+import ProfileScreen from "../Screen/learnerAccount/account"
+import InboxScreen from "../Screen/inbox/inbox"
 export const TabData = [
   {
     id: 1,
@@ -16,7 +19,7 @@ export const TabData = [
     unFocusSize: 28,
   },
   // {
-  //   id: 2, 
+  //   id: 2,
   //   route: HomeScreen,
   //   name: 'Friends',
   //   activeIconName: 'people-sharp',
@@ -49,19 +52,30 @@ export const TabData = [
     unFocusSize: 25,
   },
   {
+    id: 1,
+    route: MyCoursesScreen,
+    name: 'myCourse',
+    activeIconName: 'myCourse',
+    activeiconType: 'MaterialCommunityIcons',
+    inactiveIconName: 'play-box-outline',
+    inactiveIconType: 'MaterialCommunityIcons',
+    size: 25,
+    unFocusSize: 28,
+  },
+  {
     id: 5,
-    route: NotificationsScreen,
+    route: InboxScreen,
     name: 'Notification',
     activeIconName: 'notifications',
     activeiconType: 'Ionicons',
-    inactiveIconName: 'notifications-outline', 
+    inactiveIconName: 'notifications-outline',
     inactiveIconType: 'Ionicons',
     size: 25,
     unFocusSize: 25,
   },
   {
     id: 6,
-    route: AccountScreen,
+    route: ProfileScreen,
     name: 'Profile',
     activeIconName: 'person',
     activeiconType: 'Ionicons',

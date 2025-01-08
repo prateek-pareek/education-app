@@ -2,96 +2,102 @@ import React, {useState} from 'react'
 import {
   View,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   TextInput,
+  Text,
   FlatList,
+  TouchableOpacity,
+  ScrollView,
 } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import FilterModal from './filterCourse'
 
-const completedCoursesData = [
+const coursesData = [
   {
     id: '1',
     category: 'Graphic Design',
     title: 'Graphic Design Advanced',
-    duration: '2 Hrs 36 Mins',
+    price: '89/-',
+    oldPrice: '499',
     rating: 4.2,
-    certificate: true,
+    students: '7830 Std',
+    bookmarked: true,
   },
   {
     id: '2',
     category: 'Graphic Design',
     title: 'Advance Diploma in Gra..',
-    duration: '3 Hrs 28 Mins',
-    rating: 4.7,
-    certificate: true,
+    price: '800/-',
+    rating: 4.0,
+    students: '12680 Std',
+    bookmarked: false,
   },
   {
     id: '3',
-    category: 'Digital Marketing',
-    title: 'Setup your Graphic Des..',
-    duration: '4 Hrs 05 Mins',
+    category: 'Graphic Design',
+    title: 'Graphic Design Advanced',
+    price: '799/-',
     rating: 4.2,
-    certificate: true,
+    students: '990 Std',
+    bookmarked: true,
   },
   {
     id: '4',
     category: 'Web Development',
     title: 'Web Developer conce..',
-    duration: '4 Hrs 05 Mins',
-    rating: 4.6,
-    certificate: true,
+    price: '999/-',
+    rating: 4.9,
+    students: '14580 Std',
+    bookmarked: false,
   },
 ]
 
-const ongoingCoursesData = [
-  {
-    id: '1',
-    category: 'Graphic Design',
-    title: 'Graphic Design Basics',
-    duration: '1 Hrs 30 Mins',
-    rating: 4.0,
-  },
-  {
-    id: '2',
-    category: 'Programming',
-    title: 'Python for Beginners',
-    duration: '5 Hrs 10 Mins',
-    rating: 4.8,
-  },
-]
-
-const MyCoursesScreen = ({navigation}) => {
-  const [activeTab, setActiveTab] = useState('Completed')
+const SearchCoursesScreen = () => {
+  const [activeTab, setActiveTab] = useState('Courses')
   const [searchText, setSearchText] = useState('')
+  const [isVisible, setIsVisible] = useState(false)
 
-  const renderCourseCard = ({item, navigations}) => (
+  const toggleBookmark = id => {
+    // Logic to toggle bookmarks for each course
+    const updatedCourses = coursesData.map(course =>
+      course.id === id ? {...course, bookmarked: !course.bookmarked} : course,
+    )
+    return updatedCourses
+  }
+
+  const renderCourseCard = ({item}) => (
     <View style={styles.courseCard}>
+      {/* Placeholder for course image */}
       <View style={styles.courseImagePlaceholder} />
+
+      {/* Course Details */}
       <View style={styles.courseContent}>
         <Text style={styles.courseCategory}>{item.category}</Text>
         <Text style={styles.courseTitle} numberOfLines={1}>
           {item.title}
         </Text>
+        <Text style={styles.coursePrice}>
+          {item.price}
+          {item.oldPrice && (
+            <Text style={styles.oldPrice}> {item.oldPrice}</Text>
+          )}
+        </Text>
         <View style={styles.courseMeta}>
           <Icon name='star' size={16} color='#FFC107' />
           <Text style={styles.courseRating}>{item.rating}</Text>
-          <Text style={styles.courseDuration}>| {item.duration}</Text>
+          <Text style={styles.courseStudents}>| {item.students}</Text>
         </View>
-        {activeTab === 'Completed' && item.certificate && (
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('CourseDetailsScreen')
-            }}>
-            <Text style={styles.certificateText}>VIEW CERTIFICATE</Text>
-          </TouchableOpacity>
-        )}
       </View>
-      {activeTab === 'Completed' && (
-        <View style={styles.completionBadge}>
-          <Icon name='check' size={18} color='#FFFFFF' />
-        </View>
-      )}
+
+      {/* Bookmark Button */}
+      <TouchableOpacity
+        onPress={() => toggleBookmark(item.id)}
+        style={styles.bookmarkButton}>
+        <Icon
+          name={item.bookmarked ? 'bookmark' : 'bookmark-outline'}
+          size={20}
+          color={item.bookmarked ? '#0047FF' : '#7D7D7D'}
+        />
+      </TouchableOpacity>
     </View>
   )
 
@@ -99,78 +105,71 @@ const MyCoursesScreen = ({navigation}) => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Courses</Text>
+        <TouchableOpacity>
+          <Icon name='arrow-left' size={28} color='#000' />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Online Courses</Text>
       </View>
 
       {/* Search Bar */}
       <View style={styles.searchBar}>
         <TextInput
-          placeholder='Search for ...'
+          placeholder='Graphic Design'
           style={styles.searchInput}
           value={searchText}
           onChangeText={setSearchText}
         />
-        <TouchableOpacity style={styles.searchIconContainer}>
-          <Icon name='magnify' size={24} color='#FFFFFF' />
+        <TouchableOpacity style={styles.searchIconContainer} onPress={()=>{setIsVisible(true)}}>
+          <Icon name='tune' size={24} color='#FFFFFF' />
         </TouchableOpacity>
       </View>
 
-      {/* Tabs (Completed/Ongoing) */}
+      {/* Tabs (Courses/Mentors) */}
       <View style={styles.tabs}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'Completed' && styles.activeTab]}
-          onPress={() => setActiveTab('Completed')}>
+          style={[styles.tab, activeTab === 'Courses' && styles.activeTab]}
+          onPress={() => setActiveTab('Courses')}>
           <Text
             style={[
               styles.tabText,
-              activeTab === 'Completed' && styles.activeTabText,
+              activeTab === 'Courses' && styles.activeTabText,
             ]}>
-            Completed
+            Courses
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'Ongoing' && styles.activeTab]}
-          onPress={() => setActiveTab('Ongoing')}>
+          style={[styles.tab, activeTab === 'Mentors' && styles.activeTab]}
+          onPress={() => setActiveTab('Mentors')}>
           <Text
             style={[
               styles.tabText,
-              activeTab === 'Ongoing' && styles.activeTabText,
+              activeTab === 'Mentors' && styles.activeTabText,
             ]}>
-            Ongoing
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'UpComing' && styles.activeTab]}
-          onPress={() => setActiveTab('UpComing')}>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'UpComing' && styles.activeTabText,
-            ]}>
-            UpComing
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'Live' && styles.activeTab]}
-          onPress={() => setActiveTab('Live')}>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'Live' && styles.activeTabText,
-            ]}>
-            Live
+            Mentors
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* Search Results */}
+      <View style={styles.resultsHeader}>
+        <Text style={styles.resultText}>
+          Result for "<Text style={styles.highlightedText}>Graphic Design</Text>
+          "
+        </Text>
+        <TouchableOpacity>
+          <Text style={styles.foundText}>2480 FOUND</Text>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
-        data={
-          activeTab === 'Completed' ? completedCoursesData : ongoingCoursesData
-        }
+        data={coursesData}
         keyExtractor={item => item.id}
-        renderItem={item => renderCourseCard(item, navigation)}
+        renderItem={renderCourseCard}
         contentContainerStyle={styles.courseList}
         showsVerticalScrollIndicator={false}
       />
+
+      {isVisible && <FilterModal isVisible={isVisible} onClose={setIsVisible}/>}
     </View>
   )
 }
@@ -183,7 +182,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    textAlign:"center",
     paddingHorizontal: 16,
     marginTop: 16,
   },
@@ -192,7 +190,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 16,
     color: '#000',
-
   },
   searchBar: {
     flexDirection: 'row',
@@ -240,6 +237,25 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: '#FFFFFF',
   },
+  resultsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 16,
+  },
+  resultText: {
+    fontSize: 14,
+    color: '#7D7D7D',
+  },
+  highlightedText: {
+    color: '#0047FF',
+    fontWeight: 'bold',
+  },
+  foundText: {
+    fontSize: 14,
+    color: '#0047FF',
+  },
   courseList: {
     paddingHorizontal: 16,
     paddingBottom: 16,
@@ -272,6 +288,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
+  coursePrice: {
+    fontSize: 16,
+    color: '#0047FF',
+    fontWeight: 'bold',
+  },
+  oldPrice: {
+    fontSize: 14,
+    color: '#7D7D7D',
+    textDecorationLine: 'line-through',
+    marginLeft: 8,
+  },
   courseMeta: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -282,24 +309,12 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     color: '#000',
   },
-  courseDuration: {
+  courseStudents: {
     fontSize: 12,
     marginLeft: 8,
     color: '#7D7D7D',
   },
-  certificateText: {
-    fontSize: 14,
-    color: '#0047FF',
-    marginTop: 8,
-    fontWeight: 'bold',
-  },
-  completionBadge: {
-    backgroundColor: '#00A37A',
-    borderRadius: 50,
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+  bookmarkButton: {
     position: 'absolute',
     top: 12,
     right: 12,
@@ -327,4 +342,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default MyCoursesScreen
+export default SearchCoursesScreen

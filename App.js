@@ -25,9 +25,9 @@ import {AppProvider} from './appContext'
 import Login from './src/Screen/Auth/Login/login'
 import SignUpScreen from './src/Screen/Auth/SignUp/signup'
 import MainScreen from './src/Screen/Home/MainScreen'
-import EditProfileScreen from './src/Screen/accounts/profile'
+// import EditProfileScreen from './src/Screen/accounts/profile'
 import PaymentScreen from './src/Screen/accounts/payment'
-import CourseCard from './src/Screen/myCourse/courseCard'
+import PopularCoursesScreen from './src/Screen/explore/courseList'
 import CommentScreen from './src/Screen/Home/coment'
 import {Text, SafeAreaView} from 'react-native'
 import explorer from './src/Screen/accounts/explorer'
@@ -37,7 +37,19 @@ import MoreScreen from './src/Screen/Notification/MoreScreen'
 // import ChatListScreen from './src/Screen/Notification/chat'
 // import ChatScreen from './src/Screen/Notification/message'
 // import LiveStream from './src/Screen/LiveStream/liveStream'
-
+import GetPremiumScreen from './src/Screen/subscription/subscription'
+import CategoryScreen from './src/Screen/explore/courseCategory'
+import SearchCoursesScreen from './src/Screen/explore/searchCourse'
+import MyCoursesScreen from './src/Screen/myCourse/myCourse'
+import CourseDetailsScreen from './src/Screen/common/courseDetails/courseDetails'
+import ReviewsScreen from './src/Screen/common/Review/displayReview'
+import WriteReviewScreen from './src/Screen/common/Review/writeReview'
+import ProfileScreen from "./src/Screen/learnerAccount/account"
+import EditProfileScreen from "./src/Screen/learnerAccount/editProfile";
+import TermsConditionsScreen from "./src/Screen/common/term/term"
+import PaymentMethodsScreen from "./src/Screen/common/payment/payment"
+// import SignInScreen from "./src/Screen/Auth/Login/login1"
+import InboxScreen from "./src/Screen/inbox/inbox"
 enableScreens()
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
@@ -52,15 +64,38 @@ const AppNavigator = () => {
       <Stack.Screen name='MainScreen' component={MainScreen} />
       <Stack.Screen name='EditProfileScreen' component={EditProfileScreen} />
       <Stack.Screen name='PaymentScreen' component={PaymentScreen} />
-      <Stack.Screen name='CourseCard' component={CourseCard} />
+      <Stack.Screen name='CourseCard' component={PopularCoursesScreen} />
       <Stack.Screen name='CommentScreen' component={CommentScreen} />
       {/* <Stack.Screen name='chat' component={ChatListScreen} />
       <Stack.Screen name='ChatScreen' component={ChatScreen} /> */}
       {/* <Stack.Screen name='LiveStream' component={LiveStream} /> */}
       <Stack.Screen name='explorer' component={explorer} />
-      <Stack.Screen name='NotificationsScreen' component={NotificationsScreen} />
+      <Stack.Screen
+        name='NotificationsScreen'
+        component={NotificationsScreen}
+      />
       <Stack.Screen name='CourseDetailScreen' component={CourseDetailScreen} />
       <Stack.Screen name='MoreScreen' component={MoreScreen} />
+      <Stack.Screen name='GetPremiumScreen' component={GetPremiumScreen} />
+      <Stack.Screen name='CategoryScreen' component={CategoryScreen} />
+      <Stack.Screen
+        name='SearchCoursesScreen'
+        component={SearchCoursesScreen}
+      />
+      <Stack.Screen name='MyCoursesScreen' component={MyCoursesScreen} />
+      <Stack.Screen
+        name='CourseDetailsScreen'
+        component={CourseDetailsScreen}
+      />
+      <Stack.Screen name='Review' component={ReviewsScreen} />
+      <Stack.Screen name='WriteReview' component={WriteReviewScreen} />
+      <Stack.Screen name='learnerProfile' component={ProfileScreen} />
+      <Stack.Screen name='editProfile' component={EditProfileScreen} />
+      <Stack.Screen name='term' component={TermsConditionsScreen} />
+      <Stack.Screen name='payment' component={PaymentMethodsScreen} />
+      {/* <Stack.Screen name='SignIn' component={SignInScreen} /> */}
+      <Stack.Screen name='inbox' component={InboxScreen} />
+
     </Stack.Navigator>
   )
 }
