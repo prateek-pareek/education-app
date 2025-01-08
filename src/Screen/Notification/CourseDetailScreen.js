@@ -1,13 +1,17 @@
-import React from 'react';
+// CourseDetailScreen.js
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { allCourseData } from '../../data/allCourseData';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Make sure to install this package
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Video from 'react-native-video';
 
 const CourseDetailScreen = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const { courseId } = route.params;
   const course = allCourseData.find(course => course.id === courseId);
+  const [showVideo, setShowVideo] = useState(false);
 
   if (!course) {
     return (
@@ -37,24 +41,60 @@ const CourseDetailScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <ImageBackground source={{ uri: course.bgImage }} style={styles.bgImage}>
-        <View style={styles.header}>
-          <Text style={styles.courseTitle}>{course.title}</Text>
-          <Text style={styles.courseTutor}>by {course.tutor}</Text>
-          <TouchableOpacity style={styles.getStartedButton}>
-            <Text style={styles.getStartedText}>Get started</Text>
-          </TouchableOpacity>
-        </View>
-      </ImageBackground>
+      {/* <ImageBackground source={{ uri: course.bgImage }} style={styles.bgImage}> */}
+      <ImageBackground source={require('../../../public/images/react-native.png')} style={styles.bgImage}>
 
-      {/* tabs */}
+      <View style={styles.header}>
+  {showVideo ? (
+    <Video
+      source={require('../../../public/images/teacher.mp4')} // Ensure the path is correct
+      style={styles.video}
+      controls // Enables play/pause and other media controls
+      resizeMode="cover" // Adjust video scaling
+      onEnd={() => setShowVideo(false)} // Optional: Handle video end
+    />
+  ) : (
+    <>
+      <Text style={styles.courseTitle}>{course.title}</Text>
+      <Text style={styles.courseTutor}>by {course.tutor}</Text>
+      <TouchableOpacity
+        style={styles.getStartedButton}
+        onPress={() => setShowVideo(true)}
+      >
+        <Text style={styles.getStartedText}>Get started</Text>
+      </TouchableOpacity>
+    </>
+  )}
+</View>
+
+
+        {/* <View style={styles.header}>
+          {showVideo ? (
+            <Video
+              source={require('../../public/images/teacher.mp4')}
+              style={styles.video}
+              controls
+            />
+          ) : (
+            <>
+              <Text style={styles.courseTitle}>{course.title}</Text>
+              <Text style={styles.courseTutor}>by {course.tutor}</Text>
+              <TouchableOpacity style={styles.getStartedButton} onPress={() => setShowVideo(true)}>
+                <Text style={styles.getStartedText}>Get started</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View> */}
+      </ImageBackground>
       <View style={styles.content}>
         <View style={styles.tabs}>
-          <View style={styles.tabContainer}>
+          <TouchableOpacity style={styles.tabContainer} onPress={() => navigation.navigate('CourseDetail', { courseId })}>
             <Text style={styles.tabText}>Lectures</Text>
             <View style={styles.purpleLine} />
-          </View>
-          <Text style={styles.tabTextMore}>More</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('MoreScreen', { courseId })}>
+            <Text style={styles.tabText}>More</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.downloadButton}>
             <Icon name="download" size={20} color="black" />
           </TouchableOpacity>
@@ -76,12 +116,12 @@ const styles = StyleSheet.create({
   },
   bgImage: {
     width: '100%',
-    height: 200,
+    height: 250, // Increased height
     justifyContent: 'flex-end',
     padding: 20,
   },
   header: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -108,6 +148,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  video: {
+    width: '100%',
+    height: 200,
+    backgroundColor: 'black',
+  },
   content: {
     padding: 20,
   },
@@ -125,11 +170,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginRight: 20,
-  },
-  tabTextMore:{
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: -120,
   },
   purpleLine: {
     height: 2,

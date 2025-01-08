@@ -20,7 +20,7 @@ const NotificationsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>My learning</Text>
+      <Text style={styles.header}>My learning</Text> 
       <View style={styles.searchBar}>
         <Text style={styles.searchText}>Search</Text>
       </View>
