@@ -20,7 +20,7 @@ const BottomTabbar = () => {
           <Tab.Screen
             key={tab.id}
             name={tab.name}
-            component={tab.route}
+            component={tab.route} 
             options={{
               tabBarIcon: ({color, focused}) => (
                 <VectorIcon

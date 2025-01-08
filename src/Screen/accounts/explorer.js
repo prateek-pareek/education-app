@@ -1,13 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // Import the icon library
+import { useNavigation } from '@react-navigation/native'; // Import the useNavigation hook
 
 const Explorer = () => {
+  const navigation = useNavigation(); // Initialize the navigation object
+
   return (
     <View style={styles.container}>
       <ImageBackground source={require('./../../../public/images/explore.png')} style={styles.backgroundImage}>
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Icon name="arrow-back" size={30} color="white" />
           </TouchableOpacity>
         </View>

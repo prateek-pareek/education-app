@@ -31,6 +31,9 @@ import CourseCard from './src/Screen/myCourse/courseCard'
 import CommentScreen from './src/Screen/Home/coment'
 import {Text, SafeAreaView} from 'react-native'
 import explorer from './src/Screen/accounts/explorer'
+import NotificationsScreen from './src/Screen/Notification/notification'
+import CourseDetailScreen from './src/Screen/Notification/CourseDetailScreen'
+import MoreScreen from './src/Screen/Notification/MoreScreen'
 // import ChatListScreen from './src/Screen/Notification/chat'
 // import ChatScreen from './src/Screen/Notification/message'
 // import LiveStream from './src/Screen/LiveStream/liveStream'
@@ -55,6 +58,9 @@ const AppNavigator = () => {
       <Stack.Screen name='ChatScreen' component={ChatScreen} /> */}
       {/* <Stack.Screen name='LiveStream' component={LiveStream} /> */}
       <Stack.Screen name='explorer' component={explorer} />
+      <Stack.Screen name='NotificationsScreen' component={NotificationsScreen} />
+      <Stack.Screen name='CourseDetailScreen' component={CourseDetailScreen} />
+      <Stack.Screen name='MoreScreen' component={MoreScreen} />
     </Stack.Navigator>
   )
 }

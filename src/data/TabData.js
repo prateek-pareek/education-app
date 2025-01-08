@@ -16,7 +16,7 @@ export const TabData = [
     unFocusSize: 28,
   },
   // {
-  //   id: 2,
+  //   id: 2, 
   //   route: HomeScreen,
   //   name: 'Friends',
   //   activeIconName: 'people-sharp',
@@ -54,7 +54,7 @@ export const TabData = [
     name: 'Notification',
     activeIconName: 'notifications',
     activeiconType: 'Ionicons',
-    inactiveIconName: 'notifications-outline',
+    inactiveIconName: 'notifications-outline', 
     inactiveIconType: 'Ionicons',
     size: 25,
     unFocusSize: 25,
