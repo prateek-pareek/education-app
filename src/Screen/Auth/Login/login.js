@@ -16,6 +16,8 @@ import {
   facebookProvider,
 } from '../../../../firebaseConfig'
 import {signInWithEmailAndPassword, signInWithCredential} from 'firebase/auth'
+import axios from 'axios'
+
 
 const SignInScreen = ({navigation}) => {
   const [email, setEmail] = useState('')
@@ -38,6 +40,32 @@ const SignInScreen = ({navigation}) => {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password)
+
+      let data = JSON.stringify({
+        email: email,
+        password: password,
+        role: 'Learner',
+      })
+
+      let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${process.env.baseUrl}api/auth/login`,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: data,
+      }
+      axios
+        .request(config)
+        .then(response => {
+          console.log(JSON.stringify(response.data))
+          navigation.navigate('MainScreen')
+        })
+        .catch(error => {
+          console.log(error)
+        })
+
       Alert.alert('Login Success', `Logged in with email: ${email}`)
     } catch (error) {
       Alert.alert('Login Failed', error.message)
@@ -146,7 +174,8 @@ const SignInScreen = ({navigation}) => {
           </View>
           <Text style={styles.rememberMeText}>Remember Me</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ForgotPasswordScreen')}>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
       </View>
@@ -181,7 +210,7 @@ const SignInScreen = ({navigation}) => {
       <View style={styles.signUpContainer}>
         <Text style={styles.signUpText}>Don't have an Account? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('SignUp2')}>
-          <Text style={styles.signUpLink} >SIGN UP</Text>
+          <Text style={styles.signUpLink}>SIGN UP</Text>
         </TouchableOpacity>
       </View>
     </View>

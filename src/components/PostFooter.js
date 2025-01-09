@@ -16,9 +16,9 @@ const PostFooter = ({data}) => {
           <Image source={Like} style={styles.reactionIcon} />
           <Image source={Shock} style={styles.reactionIcon} />
           <Image source={Heart} style={styles.reactionIcon} />
-          <Text style={styles.reactionCount}>{data.reactionCount}</Text>
+          <Text style={styles.reactionCount}>{data?.reactionCount}</Text>
         </View>
-        <Text style={styles.reactionCount}>{data.comments} comments</Text>
+        <Text style={styles.reactionCount}>{data?.comments} comments</Text>
       </View>
       <View style={styles.userActionSec}>
         <View style={styles.row}>

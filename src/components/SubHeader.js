@@ -11,6 +11,7 @@ import React, {useState} from 'react'
 import Profile from '../../public/images/img1.jpeg'
 import {launchImageLibrary} from 'react-native-image-picker'
 import {Colors} from '../utils/Colors'
+import axios from "axios"
 
 const SubHeader = () => {
   const [modalVisible, setModalVisible] = useState(false)
@@ -29,6 +30,30 @@ const SubHeader = () => {
         }
       },
     )
+  }
+
+  const handleSubmit = async () => {
+    try {
+      // const uploadedMediaUrl = await uploadMedia();
+      // setMediaUrl(uploadedMediaUrl);
+
+      const response = await axios.post(
+        `${process.env.baseUrl}api/posts/create`,
+        {
+          content: postContent,
+          mediaUrl: 'https:mathionix.com',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJWQTlaOFI0V3pRVjN4TzJtdGVTZGlrck45Q3UyIiwiZW1haWwiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzM2NDU0MDI5LCJleHAiOjE3MzY1NDA0Mjl9.9AztC7B1CqDadoQFpQ1PpC-cE3d5gHGNUY29fLSQc_U"}`, 
+          },
+        }
+      )
+      console.log('Post created:', response.data)
+      setModalVisible(false)
+    } catch (error) {
+      console.error('Error creating post:', error)
+    }
   }
 
   return (
@@ -86,13 +111,7 @@ const SubHeader = () => {
               <Text style={styles.addMediaText}>Upload Media</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.postButton}
-              onPress={() => {
-                setModalVisible(false)
-                console.log('Post Content:', postContent)
-                console.log('Media:', media)
-              }}>
+            <TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
               <Text style={styles.postButtonText}>Post</Text>
             </TouchableOpacity>
           </View>

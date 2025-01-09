@@ -1,23 +1,26 @@
-import {View, Image, StyleSheet, Text} from 'react-native';
-import React from 'react';
-import UserProfile from '../../public/images/post1.jpeg';
-import {Colors} from '../utils/Colors';
-import VectorIcon from '../utils/VectorIcon';
+import {View, Image, StyleSheet, Text} from 'react-native'
+import React from 'react'
+import UserProfile from '../../public/images/post1.jpeg'
+import {Colors} from '../utils/Colors'
+import VectorIcon from '../utils/VectorIcon'
 
 const PostHeader = ({data}) => {
   return (
     <View style={styles.postHeaderContainer}>
       <View style={styles.postTopSec}>
         <View style={styles.row}>
-          <Image source={data.profileImg} style={styles.userProfile} />
+          <Image
+            source={data?.profileImg || '../../public/images/img8.jpeg'}
+            style={styles.userProfile}
+          />
           <View style={styles.userSection}>
-            <Text style={styles.username}>{data.name}</Text>
+            <Text style={styles.username}>{data?.name || 'Test'}</Text>
             <View style={styles.row}>
-              <Text style={styles.days}>{data.date}</Text>
+              <Text style={styles.days}>{data?.date || 'bkjhk'}</Text>
               <Text style={styles.dot}>•</Text>
               <VectorIcon
-                name="user-friends"
-                type="FontAwesome5"
+                name='user-friends'
+                type='FontAwesome5'
                 size={13}
                 color={Colors.headerIconGrey}
                 style={styles.userIcon}
@@ -27,24 +30,24 @@ const PostHeader = ({data}) => {
         </View>
         <View style={styles.row}>
           <VectorIcon
-            name="dots-three-horizontal"
-            type="Entypo"
+            name='dots-three-horizontal'
+            type='Entypo'
             size={25}
             color={Colors.headerIconGrey}
             style={styles.headerIcons}
           />
           <VectorIcon
-            name="close"
-            type="Ionicons"
+            name='close'
+            type='Ionicons'
             size={25}
             color={Colors.headerIconGrey}
           />
         </View>
       </View>
-      <Text style={styles.caption}>{data.caption}</Text>
+      <Text style={styles.caption}>{data?.content}</Text>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   postHeaderContainer: {
@@ -90,6 +93,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginTop: 10,
   },
-});
+})
 
-export default PostHeader;
+export default PostHeader
