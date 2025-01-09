@@ -48,8 +48,10 @@ import ProfileScreen from "./src/Screen/learnerAccount/account"
 import EditProfileScreen from "./src/Screen/learnerAccount/editProfile";
 import TermsConditionsScreen from "./src/Screen/common/term/term"
 import PaymentMethodsScreen from "./src/Screen/common/payment/payment"
-// import SignInScreen from "./src/Screen/Auth/Login/login1"
+import SignInScreen from "./src/Screen/Auth/Login/login"
 import InboxScreen from "./src/Screen/inbox/inbox"
+import HelpCenterScreen from "./src/Screen/help/help"
+import ContactScreen from "./src/Screen/help/contact"
 enableScreens()
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
@@ -93,8 +95,10 @@ const AppNavigator = () => {
       <Stack.Screen name='editProfile' component={EditProfileScreen} />
       <Stack.Screen name='term' component={TermsConditionsScreen} />
       <Stack.Screen name='payment' component={PaymentMethodsScreen} />
-      {/* <Stack.Screen name='SignIn' component={SignInScreen} /> */}
+      <Stack.Screen name='SignIn' component={SignInScreen} />
       <Stack.Screen name='inbox' component={InboxScreen} />
+      <Stack.Screen name="HelpCenterScreen" component={HelpCenterScreen}/>
+      <Stack.Screen name="Contact" component={ContactScreen}/>
 
     </Stack.Navigator>
   )

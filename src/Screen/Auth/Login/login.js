@@ -1,14 +1,14 @@
 import React, {useState, useEffect} from 'react'
 import {
   View,
-  StyleSheet,
   Text,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
+  Image,
 } from 'react-native'
-import {GoogleSignin} from '@react-native-google-signin/google-signin'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import {GoogleSignin} from '@react-native-google-signin/google-signin'
 import {LoginManager, AccessToken} from 'react-native-fbsdk-next'
 import {
   auth,
@@ -17,10 +17,11 @@ import {
 } from '../../../../firebaseConfig'
 import {signInWithEmailAndPassword, signInWithCredential} from 'firebase/auth'
 
-const LoginScreen = ({navigation}) => {
+const SignInScreen = ({navigation}) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [passwordVisible, setPasswordVisible] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -28,6 +29,11 @@ const LoginScreen = ({navigation}) => {
         '477322964738-t8f6a1l19m9nnvmcjvv8mra2uo1ughs1.apps.googleusercontent.com',
     })
   }, [])
+
+  const handleSignIn = () => {
+    // Handle sign-in logic
+    console.log('Signing In with:', {email, password, rememberMe})
+  }
 
   const handleLogin = async () => {
     try {
@@ -41,8 +47,8 @@ const LoginScreen = ({navigation}) => {
   const handleGoogleLogin = async () => {
     try {
       const {idToken} = await GoogleSignin.signIn()
-      const googleCredential = googleProvider.credential(idToken) 
-      await signInWithCredential(auth, googleCredential) 
+      const googleCredential = googleProvider.credential(idToken)
+      await signInWithCredential(auth, googleCredential)
       Alert.alert('Google Login', 'Logged in successfully via Google')
     } catch (error) {
       Alert.alert('Google Login Failed', error.message)
@@ -81,62 +87,78 @@ const LoginScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Log In</Text>
+      {/* Logo Section */}
+      <View style={styles.logoContainer}>
+        {/* <Image
+          source={require('./path-to-your-logo.png')} // Replace with your logo path
+          style={styles.logo}
+        /> */}
+        <Text style={styles.logoText}>EDUPRO</Text>
+        <Text style={styles.logoSubText}>LEARN FROM HOME</Text>
+      </View>
+
+      {/* Title Section */}
+      <Text style={styles.title}>Let's Sign In.!</Text>
+      <Text style={styles.subtitle}>
+        Login to Your Account to Continue your Courses
+      </Text>
 
       {/* Email Input */}
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Your Email</Text>
+        <Icon name='email-outline' size={20} color='#7D7D7D' />
         <TextInput
           style={styles.input}
-          placeholder='Enter your email'
-          keyboardType='email-address'
+          placeholder='Email'
           value={email}
           onChangeText={setEmail}
+          keyboardType='email-address'
+          placeholderTextColor='#7D7D7D'
         />
       </View>
 
+      {/* Password Input */}
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Password</Text>
+        <Icon name='lock-outline' size={20} color='#7D7D7D' />
         <TextInput
           style={styles.input}
-          placeholder='Enter your password'
-          secureTextEntry={!passwordVisible}
+          placeholder='Password'
           value={password}
           onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+          placeholderTextColor='#7D7D7D'
         />
-        <TouchableOpacity
-          onPress={() => setPasswordVisible(!passwordVisible)}
-          style={styles.eyeIcon}>
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
           <Icon
-            name={passwordVisible ? 'eye-off' : 'eye'}
+            name={showPassword ? 'eye-outline' : 'eye-off-outline'}
             size={20}
-            color='#aaa'
+            color='#7D7D7D'
           />
         </TouchableOpacity>
       </View>
 
-      {/* Forgot Password */}
-      <TouchableOpacity style={styles.forgotPassword}>
-        <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+      {/* Remember Me and Forgot Password */}
+      <View style={styles.optionsContainer}>
+        <TouchableOpacity
+          style={styles.rememberMeContainer}
+          onPress={() => setRememberMe(!rememberMe)}>
+          <View style={styles.checkbox}>
+            {rememberMe && <Icon name='check' size={16} color='#0047FF' />}
+          </View>
+          <Text style={styles.rememberMeText}>Remember Me</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ForgetPassword')}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Sign In Button */}
+      <TouchableOpacity style={styles.signInButton} onPress={handleLogin}>
+        <Text style={styles.signInButtonText}>Sign In</Text>
+        <Icon name='arrow-right' size={24} color='#FFFFFF' />
       </TouchableOpacity>
 
-      {/* Login Button */}
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>Log In</Text>
-      </TouchableOpacity>
-
-      {/* Sign Up Link */}
-      <Text style={styles.signupText}>
-        Don’t have an account?{' '}
-        <Text
-          style={styles.signupLink}
-          onPress={() => navigation.navigate('SignUp')}>
-          Sign up
-        </Text>
-      </Text>
-
-      {/* Social Login Section */}
-      <Text style={styles.orText}>Or login with</Text>
+      {/* Or Continue With */}
+      <Text style={styles.orText}>Or Continue With</Text>
       <View style={styles.socialContainer}>
         <TouchableOpacity
           style={styles.socialButton}
@@ -154,6 +176,14 @@ const LoginScreen = ({navigation}) => {
           <Icon name='linkedin' size={20} color='#1877F2' />
         </TouchableOpacity>
       </View>
+
+      {/* Sign Up Link */}
+      <View style={styles.signUpContainer}>
+        <Text style={styles.signUpText}>Don't have an Account? </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.signUpLink} >SIGN UP</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
@@ -161,88 +191,138 @@ const LoginScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
-    padding: 20,
+    backgroundColor: '#F6F9FC',
+    paddingHorizontal: 16,
   },
-  header: {
-    fontSize: 28,
+  logoContainer: {
+    alignItems: 'center',
+    marginVertical: 32,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+  },
+  logoText: {
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#1C1C1C',
-    marginBottom: 30,
+    color: '#0047FF',
+    marginTop: 8,
+  },
+  logoSubText: {
+    fontSize: 14,
+    color: '#7D7D7D',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1D1D1D',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#7D7D7D',
+    textAlign: 'center',
+    marginBottom: 32,
   },
   inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    color: '#1C1C1C',
-    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    height: 48,
   },
   input: {
-    height: 48,
+    flex: 1,
+    fontSize: 14,
+    color: '#1D1D1D',
+    marginLeft: 8,
+  },
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  rememberMeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#FFFFFF',
-    fontSize: 16,
+    borderColor: '#E5E5E5',
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
   },
-  eyeIcon: {
-    position: 'absolute',
-    right: 12,
-  },
-  forgotPassword: {
-    alignSelf: 'flex-end',
+  rememberMeText: {
+    fontSize: 14,
+    color: '#7D7D7D',
   },
   forgotPasswordText: {
     fontSize: 14,
-    color: '#007BFF',
+    color: '#0047FF',
   },
-  loginButton: {
-    backgroundColor: '#4E68E8',
-    height: 48,
-    borderRadius: 8,
+  signInButton: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 20,
+    backgroundColor: '#0047FF',
+    paddingVertical: 14,
+    borderRadius: 50,
+    marginBottom: 16,
   },
-  loginButtonText: {
+  signInButtonText: {
     fontSize: 16,
+    fontWeight: 'bold',
     color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-  signupText: {
-    fontSize: 14,
-    color: '#1C1C1C',
-    textAlign: 'center',
-  },
-  signupLink: {
-    color: '#007BFF',
-    fontWeight: 'bold',
+    marginRight: 8,
   },
   orText: {
     fontSize: 14,
-    color: '#1C1C1C',
+    color: '#7D7D7D',
     textAlign: 'center',
-    marginVertical: 20,
+    marginVertical: 16,
   },
   socialContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 20,
+    marginBottom: 16,
   },
   socialButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    backgroundColor: '#FFFFFF',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+    marginHorizontal: 8,
+    elevation: 2,
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
+  },
+  signUpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  signUpText: {
+    fontSize: 14,
+    color: '#7D7D7D',
+  },
+  signUpLink: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#0047FF',
   },
 })
 
-export default LoginScreen
+export default SignInScreen

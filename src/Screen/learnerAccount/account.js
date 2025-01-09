@@ -53,13 +53,13 @@ const ProfileScreen = () => {
       id: '8',
       title: 'Help Center',
       icon: 'help-circle-outline',
-      route: 'editProfile',
+      route: 'HelpCenterScreen',
     },
     {
       id: '9',
-      title: 'Invite Friends',
+      title: 'Contact Us',
       icon: 'account-multiple-plus-outline',
-      route: 'editProfile',
+      route: 'Contact',
     },
   ]
 

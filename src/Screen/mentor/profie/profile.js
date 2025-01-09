@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react'
 import {
   View,
   Text,
@@ -7,13 +7,12 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+} from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const InstructorProfileScreen = () => {
-  const [activeTab, setActiveTab] = useState('Courses'); // Manage active tab state
+  const [activeTab, setActiveTab] = useState('Courses')
 
-  // Sample Course Data
   const courses = [
     {
       id: '1',
@@ -33,13 +32,13 @@ const InstructorProfileScreen = () => {
       rating: 4.2,
       students: 990,
     },
-  ];
+  ]
 
   // Render each course item
-  const renderCourseItem = ({ item }) => (
+  const renderCourseItem = ({item}) => (
     <View style={styles.courseCard}>
       <View style={styles.courseThumbnail}>
-        <Icon name="image" size={50} color="#E0E0E0" />
+        <Icon name='image' size={50} color='#E0E0E0' />
       </View>
       <View style={styles.courseDetails}>
         <Text style={styles.courseCategory}>{item.category}</Text>
@@ -49,31 +48,31 @@ const InstructorProfileScreen = () => {
           <Text style={styles.oldPrice}>${item.oldPrice}</Text>
         </View>
         <View style={styles.courseStats}>
-          <Icon name="star" size={16} color="#FFD700" />
+          <Icon name='star' size={16} color='#FFD700' />
           <Text style={styles.rating}>{item.rating}</Text>
           <Text style={styles.divider}>|</Text>
           <Text style={styles.students}>{item.students} Std</Text>
         </View>
       </View>
       <TouchableOpacity>
-        <Icon name="bookmark-outline" size={24} color="#0047FF" />
+        <Icon name='bookmark-outline' size={24} color='#0047FF' />
       </TouchableOpacity>
     </View>
-  );
+  )
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity>
-          <Icon name="arrow-left" size={24} color="#000" />
+          <Icon name='arrow-left' size={24} color='#000' />
         </TouchableOpacity>
       </View>
 
       {/* Profile Section */}
       <View style={styles.profileSection}>
         <View style={styles.profileImage}>
-          <Icon name="account" size={60} color="#fff" />
+          <Icon name='account' size={60} color='#fff' />
         </View>
         <Text style={styles.instructorName}>Mary Jones</Text>
         <Text style={styles.instructorTitle}>Graphic Designer At Google</Text>
@@ -111,27 +110,23 @@ const InstructorProfileScreen = () => {
       <View style={styles.tabs}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'Courses' && styles.activeTab]}
-          onPress={() => setActiveTab('Courses')}
-        >
+          onPress={() => setActiveTab('Courses')}>
           <Text
             style={[
               styles.tabText,
               activeTab === 'Courses' && styles.activeTabText,
-            ]}
-          >
+            ]}>
             Courses
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'Ratings' && styles.activeTab]}
-          onPress={() => setActiveTab('Ratings')}
-        >
+          onPress={() => setActiveTab('Ratings')}>
           <Text
             style={[
               styles.tabText,
               activeTab === 'Ratings' && styles.activeTabText,
-            ]}
-          >
+            ]}>
             Ratings
           </Text>
         </TouchableOpacity>
@@ -142,7 +137,7 @@ const InstructorProfileScreen = () => {
         <FlatList
           data={courses}
           renderItem={renderCourseItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           contentContainerStyle={styles.courseList}
         />
       )}
@@ -154,8 +149,8 @@ const InstructorProfileScreen = () => {
         </View>
       )}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -339,6 +334,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#7D7D7D',
   },
-});
+})
 
-export default InstructorProfileScreen;
+export default InstructorProfileScreen
