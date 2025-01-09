@@ -52,6 +52,8 @@ import SignInScreen from "./src/Screen/Auth/Login/login"
 import InboxScreen from "./src/Screen/inbox/inbox"
 import HelpCenterScreen from "./src/Screen/help/help"
 import ContactScreen from "./src/Screen/help/contact"
+import SignUpScreen2 from './src/Screen/Auth/SignUp/signup2'
+import ForgotPasswordScreen from './src/Screen/Auth/Forget/step01'
 enableScreens()
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
@@ -59,7 +61,8 @@ const Tab = createBottomTabNavigator()
 const AppNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName='MainScreen'
+      // initialRouteName='MainScreen'
+      initialRouteName='SignUp2'
       screenOptions={{headerShown: false}}>
       <Stack.Screen name='Login' component={Login} />
       <Stack.Screen name='SignUp' component={SignUpScreen} />
@@ -68,6 +71,8 @@ const AppNavigator = () => {
       <Stack.Screen name='PaymentScreen' component={PaymentScreen} />
       <Stack.Screen name='CourseCard' component={PopularCoursesScreen} />
       <Stack.Screen name='CommentScreen' component={CommentScreen} />
+      <Stack.Screen name='SignUp2' component={SignUpScreen2} />
+      <Stack.Screen name='ForgotPasswordScreen' component={ForgotPasswordScreen} />
       {/* <Stack.Screen name='chat' component={ChatListScreen} />
       <Stack.Screen name='ChatScreen' component={ChatScreen} /> */}
       {/* <Stack.Screen name='LiveStream' component={LiveStream} /> */}

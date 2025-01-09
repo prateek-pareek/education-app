@@ -1,7 +1,8 @@
-import {FirebaseApp} from 'firebase/app'
-import {getAuth, GoogleAuthProvider, FacebookAuthProvider} from 'firebase/auth'
-import {getFirestore} from 'firebase/firestore'
-import {initializeApp} from 'firebase/app'
+import { FirebaseApp } from 'firebase/app'
+import { initializeAuth, getReactNativePersistence, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
+import { initializeApp } from 'firebase/app'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDo99J0800ioPZ8HOkDZE_5DnXtRZYaV6o',
@@ -14,9 +15,14 @@ const firebaseConfig = {
 }
 
 const app = initializeApp(firebaseConfig)
+
+// Initialize auth with AsyncStorage persistence
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage)
+})
+
 const googleProvider = new GoogleAuthProvider()
 const facebookProvider = new FacebookAuthProvider()
-const auth = getAuth(app)
 const db = getFirestore(app)
 
-export {auth, db, googleProvider, facebookProvider}
+export { auth, db, googleProvider, facebookProvider }

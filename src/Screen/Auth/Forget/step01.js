@@ -1,21 +1,73 @@
+// ForgotPasswordScreen.js
 import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// import { auth } from '../../firebaseConfig'; 
+import { auth } from '../../../../firebaseConfig';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
-const ForgotPasswordScreen = () => {
-  const [selectedOption, setSelectedOption] = useState(null);
+const ForgotPasswordScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleContinue = () => {
-    if (selectedOption) {
-      // Handle navigation to OTP or Reset Password Screen
-      console.log('Selected Option:', selectedOption);
-    } else {
-      alert('Please select a contact method to continue.');
+  const handleResetPassword = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email address');
+      return;
+    }
+
+    if (loading) return;
+    
+    setLoading(true);
+    try {
+      console.log('Attempting to send reset email to:', email.trim());
+      await sendPasswordResetEmail(auth, email.trim());
+      
+      // Add additional logging
+      console.log('Reset email sent successfully');
+      
+      Alert.alert(
+        'Reset Email Sent',
+        'Please check your email inbox and spam folder for the reset link',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('SignIn'),
+          },
+        ]
+      );
+    } catch (error) {
+      console.error('Password reset error:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      
+      let errorMessage = 'Failed to send reset email. Please try again.';
+      
+      switch (error.code) {
+        case 'auth/invalid-email':
+          errorMessage = 'Please enter a valid email address.';
+          break;
+        case 'auth/user-not-found':
+          errorMessage = 'No user found with this email address.';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many attempts. Please try again later.';
+          break;
+        default:
+          errorMessage = `Error: ${error.message}`;
+      }
+      
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -23,7 +75,7 @@ const ForgotPasswordScreen = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-left" size={28} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Forgot Password</Text>
@@ -31,48 +83,41 @@ const ForgotPasswordScreen = () => {
 
       {/* Instruction */}
       <Text style={styles.instruction}>
-        Select which contact details should we use to Reset Your Password
+        Enter your email address to receive a password reset link
       </Text>
 
-      {/* Options */}
-      <TouchableOpacity
-        style={[
-          styles.option,
-          selectedOption === 'email' && styles.selectedOption,
-        ]}
-        onPress={() => setSelectedOption('email')}
-      >
-        <View style={styles.optionContent}>
-          <Icon name="email-outline" size={24} color="#0047FF" />
-          <View style={styles.optionTextContainer}>
-            <Text style={styles.optionTitle}>Via Email</Text>
-            <Text style={styles.optionSubtitle}>
-              priscilla.frank26@gmail.com
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[
-          styles.option,
-          selectedOption === 'sms' && styles.selectedOption,
-        ]}
-        onPress={() => setSelectedOption('sms')}
-      >
-        <View style={styles.optionContent}>
-          <Icon name="cellphone-message" size={24} color="#0047FF" />
-          <View style={styles.optionTextContainer}>
-            <Text style={styles.optionTitle}>Via SMS</Text>
-            <Text style={styles.optionSubtitle}>( +91 ) 958-894-5529</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
+      {/* Email Input */}
+      <View style={styles.inputContainer}>
+        <Icon name="email-outline" size={20} color="#7D7D7D" />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          editable={!loading}
+        />
+      </View>
 
       {/* Continue Button */}
-      <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-        <Text style={styles.continueButtonText}>Continue</Text>
-        <Icon name="arrow-right" size={24} color="#FFFFFF" />
+      <TouchableOpacity 
+        style={[
+          styles.continueButton,
+          loading && styles.disabledButton
+        ]} 
+        onPress={handleResetPassword}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#FFFFFF" />
+        ) : (
+          <>
+            <Text style={styles.continueButtonText}>Send Reset Link</Text>
+            <Icon name="arrow-right" size={24} color="#FFFFFF" />
+          </>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -102,33 +147,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
-  option: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-  },
-  selectedOption: {
-    borderColor: '#0047FF',
-    borderWidth: 2,
-  },
-  optionContent: {
+  inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginBottom: 24,
+    height: 48,
   },
-  optionTextContainer: {
-    marginLeft: 16,
-  },
-  optionTitle: {
+  input: {
+    flex: 1,
+    marginLeft: 8,
     fontSize: 16,
-    fontWeight: 'bold',
     color: '#000',
-  },
-  optionSubtitle: {
-    fontSize: 14,
-    color: '#7D7D7D',
   },
   continueButton: {
     flexDirection: 'row',
@@ -138,6 +172,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 50,
     marginTop: 16,
+  },
+  disabledButton: {
+    backgroundColor: '#B0C4FF',
   },
   continueButtonText: {
     fontSize: 16,

@@ -17,7 +17,7 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin'
 import {LoginManager, AccessToken} from 'react-native-fbsdk-next'
 import {
   auth,
-  googleProvider,
+  googleProvider, 
   facebookProvider,
 } from '../../../../firebaseConfig' // Firebase configuration
 

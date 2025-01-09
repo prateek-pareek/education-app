@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-community/slider": "^4.5.5",
     "@react-native-firebase/app": "^21.6.2",
@@ -41,6 +42,7 @@
     "react-native-vector-icons": "^10.2.0",
     "react-native-video": "^6.9.0",
     "react-native-view-more-text": "^2.2.0",
+    "react-native-webview": "^13.12.5",
     "stream-chat": "^8.49.0",
     "stream-chat-react-native": "^6.1.0"
   },
