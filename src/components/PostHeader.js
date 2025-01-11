@@ -10,13 +10,13 @@ const PostHeader = ({data}) => {
       <View style={styles.postTopSec}>
         <View style={styles.row}>
           <Image
-            source={data?.profileImg || '../../public/images/img8.jpeg'}
+            source={{uri:data?.user?.profileImage || '../../public/images/img8.jpeg'}}
             style={styles.userProfile}
           />
           <View style={styles.userSection}>
-            <Text style={styles.username}>{data?.name || 'Test'}</Text>
+            <Text style={styles.username}>{data?.user?.username || 'Test'}</Text>
             <View style={styles.row}>
-              <Text style={styles.days}>{data?.date || 'bkjhk'}</Text>
+              <Text style={styles.days}>{data?.createdAt || 'bkjhk'}</Text>
               <Text style={styles.dot}>•</Text>
               <VectorIcon
                 name='user-friends'
@@ -36,12 +36,12 @@ const PostHeader = ({data}) => {
             color={Colors.headerIconGrey}
             style={styles.headerIcons}
           />
-          <VectorIcon
+          {/* <VectorIcon
             name='close'
             type='Ionicons'
             size={25}
             color={Colors.headerIconGrey}
-          />
+          /> */}
         </View>
       </View>
       <Text style={styles.caption}>{data?.content}</Text>

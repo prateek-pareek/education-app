@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react'
 import {
   StyleSheet,
   Text,
@@ -12,28 +12,30 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Platform,
-} from 'react-native';
-import PostHeader from './PostHeader';
-import PostFooter from './PostFooter';
-import { PostData } from '../data/PostData';
+} from 'react-native'
+import PostHeader from './PostHeader'
+import PostFooter from './PostFooter'
+import {PostData} from '../data/PostData'
+import axios from 'axios'
 
-const CommentSection = () => {
-  const [comments, setComments] = useState([]);
-  const [inputText, setInputText] = useState('');
-  const [editingCommentId, setEditingCommentId] = useState(null);
-  const [replyTexts, setReplyTexts] = useState({});
-  const [showAllReplies, setShowAllReplies] = useState({});
+const CommentSection = ({route}) => {
+  const [comments, setComments] = useState([])
+  const [inputText, setInputText] = useState('')
+  const [editingCommentId, setEditingCommentId] = useState(null)
+  const [replyTexts, setReplyTexts] = useState({})
+  const [showAllReplies, setShowAllReplies] = useState({})
+  const {data} = route.params
 
   const profilePictures = [
     'https://randomuser.me/api/portraits/men/1.jpg',
     'https://randomuser.me/api/portraits/women/1.jpg',
     'https://randomuser.me/api/portraits/men/2.jpg',
     'https://randomuser.me/api/portraits/women/2.jpg',
-  ];
+  ]
 
   const getRandomProfilePicture = () => {
-    return profilePictures[Math.floor(Math.random() * profilePictures.length)];
-  };
+    return profilePictures[Math.floor(Math.random() * profilePictures.length)]
+  }
 
   const handleAddComment = () => {
     if (inputText.trim()) {
@@ -41,11 +43,11 @@ const CommentSection = () => {
         setComments(prevComments =>
           prevComments.map(comment =>
             comment.id === editingCommentId
-              ? { ...comment, text: inputText }
+              ? {...comment, text: inputText}
               : comment,
           ),
-        );
-        setEditingCommentId(null);
+        )
+        setEditingCommentId(null)
       } else {
         setComments([
           ...comments,
@@ -56,26 +58,26 @@ const CommentSection = () => {
             replies: [],
             profilePicture: getRandomProfilePicture(),
           },
-        ]);
+        ])
       }
-      setInputText('');
+      setInputText('')
     }
-  };
+  }
 
   const handleLikeComment = id => {
     setComments(prevComments =>
       prevComments.map(comment =>
-        comment.id === id ? { ...comment, likes: comment.likes + 1 } : comment,
+        comment.id === id ? {...comment, likes: comment.likes + 1} : comment,
       ),
-    );
-  };
+    )
+  }
 
   const handleDeleteComment = id => {
     Alert.alert(
       'Delete Comment',
       'Are you sure you want to delete this comment?',
       [
-        { text: 'Cancel', style: 'cancel' },
+        {text: 'Cancel', style: 'cancel'},
         {
           text: 'Delete',
           style: 'destructive',
@@ -85,17 +87,17 @@ const CommentSection = () => {
             ),
         },
       ],
-    );
-  };
+    )
+  }
 
   const handleEditComment = (id, text) => {
-    setInputText(text);
-    setEditingCommentId(id);
-  };
+    setInputText(text)
+    setEditingCommentId(id)
+  }
 
   const handleReplyTextChange = (id, text) => {
-    setReplyTexts(prev => ({ ...prev, [id]: text }));
-  };
+    setReplyTexts(prev => ({...prev, [id]: text}))
+  }
 
   const handleReplyToComment = (id, replyText) => {
     if (replyText.trim()) {
@@ -116,14 +118,39 @@ const CommentSection = () => {
               }
             : comment,
         ),
-      );
+      )
     }
-  };
+  }
 
-  const renderReply = ({ item }) => (
+  const getComments = () => {
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: `https://education-backend-jade.vercel.app/api/posts/${data.id}/comment`,
+      headers: {
+        Authorization:
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ3cng5OHhlNkhxYlJVV1BzaGlTRUVWdmF4QzMyIiwiZW1haWwiOiJnb3ZpbmRzaGFybWEud2V2b2lzQGdtYWlsLmNvbSIsImlhdCI6MTczNjU5NjI4MiwiZXhwIjoxNzM2NjgyNjgyfQ.0Psvxvf8HXia8bjYHEYDXp2-Q3jI3kghFS2RAz2JfhA',
+      },
+    }
+
+    axios
+      .request(config)
+      .then(response => {
+        console.log(JSON.stringify(response.data))
+        setComments(response.data)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+  useEffect(() => {
+    getComments()
+  })
+
+  const renderReply = ({item}) => (
     <View style={styles.replyContainer}>
       <Image
-        source={{ uri: item.profilePicture }}
+        source={{uri: item.profilePicture}}
         style={styles.profilePicture}
       />
       <View style={styles.replyContent}>
@@ -137,33 +164,35 @@ const CommentSection = () => {
         </View>
       </View>
     </View>
-  );
+  )
 
-  const renderComment = ({ item }) => {
-    const showReplies = showAllReplies[item.id] || false;
-    const visibleReplies = showReplies ? item.replies : item.replies.slice(0, 2);
+  const renderComment = ({item}) => {
+    const showReplies = showAllReplies[item.id] || false
+    const visibleReplies = showReplies
+      ? item?.replies
+      : item?.replies?.slice(0, 2)
 
     return (
       <View style={styles.commentContainer}>
         <Image
-          source={{ uri: item.profilePicture }}
+          source={{uri: item.profilePicture}}
           style={styles.profilePicture}
         />
         <View style={styles.commentContent}>
-          <Text style={styles.commentText}>{item.text}</Text>
+          <Text style={styles.commentText}>{item?.comment.text}</Text>
           <View style={styles.commentActions}>
             <TouchableOpacity
-              onPress={() => handleLikeComment(item.id)}
+              onPress={() => handleLikeComment(item?.id)}
               style={styles.likeButton}>
-              <Text style={styles.likeText}>👍 {item.likes}</Text>
+              <Text style={styles.likeText}>👍 {item?.likes}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => handleEditComment(item.id, item.text)}
+              onPress={() => handleEditComment(item?.id, item?.text)}
               style={styles.editButton}>
               <Text style={styles.editText}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => handleDeleteComment(item.id)}
+              onPress={() => handleDeleteComment(item?.id)}
               style={styles.deleteButton}>
               <Text style={styles.deleteText}>Delete</Text>
             </TouchableOpacity>
@@ -171,16 +200,16 @@ const CommentSection = () => {
           <FlatList
             data={visibleReplies}
             renderItem={renderReply}
-            keyExtractor={reply => reply.id}
+            keyExtractor={reply => reply?.id}
             contentContainerStyle={styles.replyList}
           />
-          {/* Show "Show More" button only when there are more than 2 replies */}
-          {item.replies.length > 2 && (
+
+          {item?.replies?.length > 2 && (
             <TouchableOpacity
               onPress={() =>
                 setShowAllReplies(prev => ({
                   ...prev,
-                  [item.id]: !prev[item.id],
+                  [item.id]: !prev[item?.id],
                 }))
               }
               style={styles.showRepliesButton}>
@@ -193,13 +222,13 @@ const CommentSection = () => {
             <TextInput
               style={styles.replyInput}
               value={replyTexts[item.id] || ''}
-              onChangeText={text => handleReplyTextChange(item.id, text)}
+              onChangeText={text => handleReplyTextChange(item?.id, text)}
               placeholder='Write a reply...'
             />
             <TouchableOpacity
               onPress={() => {
-                handleReplyToComment(item.id, replyTexts[item.id] || '');
-                handleReplyTextChange(item.id, ''); // Clear input after posting
+                handleReplyToComment(item?.id, replyTexts[item?.id] || '')
+                handleReplyTextChange(item?.id, '') // Clear input after posting
               }}
               style={styles.replyButton}>
               <Text style={styles.replyButtonText}>Reply</Text>
@@ -207,21 +236,21 @@ const CommentSection = () => {
           </View>
         </View>
       </View>
-    );
-  };
+    )
+  }
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{flex: 1}}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <FlatList
             ListHeaderComponent={() => (
               <>
-                <PostHeader data={PostData[0]} />
-                <Image source={PostData[0].postImg} style={styles.postImg} />
-                <PostFooter data={PostData[0]} />
+                <PostHeader data={data} />
+                <Image source={{uri: data?.mediaUrl}} style={styles.postImg} />
+                <PostFooter data={data} />
               </>
             )}
             data={comments}
@@ -249,8 +278,8 @@ const CommentSection = () => {
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -392,6 +421,6 @@ const styles = StyleSheet.create({
     color: '#007BFF',
     fontSize: 14,
   },
-});
+})
 
-export default CommentSection;
+export default CommentSection

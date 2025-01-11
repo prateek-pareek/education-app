@@ -6,22 +6,27 @@ import {
   Text,
   TouchableOpacity,
   Modal,
+  Alert,
 } from 'react-native'
 import React, {useState} from 'react'
 import Profile from '../../public/images/img1.jpeg'
 import {launchImageLibrary} from 'react-native-image-picker'
 import {Colors} from '../utils/Colors'
-import axios from "axios"
+import axios from 'axios'
+import storage from '@react-native-firebase/storage'
 
 const SubHeader = () => {
   const [modalVisible, setModalVisible] = useState(false)
   const [postContent, setPostContent] = useState('')
   const [media, setMedia] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [mediaUrl, setMediaUrl] = useState(null)
 
   const handleMediaUpload = () => {
     launchImageLibrary(
       {
-        mediaType: 'mixed', // Allows both images and videos
+        mediaType: 'mixed',
         selectionLimit: 1,
       },
       response => {
@@ -32,27 +37,69 @@ const SubHeader = () => {
     )
   }
 
+  // Upload the selected media to Firebase Storage
+  const uploadMedia = async () => {
+    if (!media) {
+      Alert.alert('No media selected')
+      return
+    }
+
+    const fileName = media.fileName || media.uri.split('/').pop()
+    const storageRef = storage().ref(`images/${fileName}`)
+
+    try {
+      setUploading(true)
+      const task = storageRef.putFile(media.uri)
+
+      task.on('state_changed', taskSnapshot => {
+        const progress =
+          (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100
+        setProgress(progress) // Update progress state
+      })
+
+      await task
+
+      // Once upload is complete, get the download URL
+      const downloadURL = await storageRef.getDownloadURL()
+      setMediaUrl(downloadURL) // Set the URL to state
+
+      setUploading(false)
+      Alert.alert('Upload successful!', 'Your media has been uploaded.')
+      return downloadURL // Return the download URL for use in submission
+    } catch (error) {
+      setUploading(false)
+      console.error('Error uploading media:', error)
+      Alert.alert('Upload failed', 'There was an issue uploading your media.')
+    }
+  }
+
+  // Handle the post submission
   const handleSubmit = async () => {
     try {
-      // const uploadedMediaUrl = await uploadMedia();
-      // setMediaUrl(uploadedMediaUrl);
+      // if (!postContent || !mediaUrl) {
+      //   Alert.alert('Please fill out all fields');
+      //   return;
+      // }
 
       const response = await axios.post(
-        `${process.env.baseUrl}api/posts/create`,
+        `https://education-backend-jade.vercel.app/api/posts/create`,
         {
           content: postContent,
-          mediaUrl: 'https:mathionix.com',
+          mediaUrl: mediaUrl || 'https://loremflickr.com/320/240/dog',
         },
         {
           headers: {
-            Authorization: `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJWQTlaOFI0V3pRVjN4TzJtdGVTZGlrck45Q3UyIiwiZW1haWwiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNzM2NDU0MDI5LCJleHAiOjE3MzY1NDA0Mjl9.9AztC7B1CqDadoQFpQ1PpC-cE3d5gHGNUY29fLSQc_U"}`, 
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ3cng5OHhlNkhxYlJVV1BzaGlTRUVWdmF4QzMyIiwiZW1haWwiOiJnb3ZpbmRzaGFybWEud2V2b2lzQGdtYWlsLmNvbSIsImlhdCI6MTczNjU5NjI4MiwiZXhwIjoxNzM2NjgyNjgyfQ.0Psvxvf8HXia8bjYHEYDXp2-Q3jI3kghFS2RAz2JfhA`,
           },
-        }
+        },
       )
-      console.log('Post created:', response.data)
       setModalVisible(false)
     } catch (error) {
       console.error('Error creating post:', error)
+      Alert.alert(
+        'Post creation failed',
+        'There was an issue creating your post.',
+      )
     }
   }
 
@@ -110,6 +157,12 @@ const SubHeader = () => {
               onPress={handleMediaUpload}>
               <Text style={styles.addMediaText}>Upload Media</Text>
             </TouchableOpacity>
+
+            {uploading && (
+              <Text style={styles.uploadProgressText}>
+                Uploading: {Math.round(progress)}%
+              </Text>
+            )}
 
             <TouchableOpacity style={styles.postButton} onPress={handleSubmit}>
               <Text style={styles.postButtonText}>Post</Text>
@@ -230,6 +283,12 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  uploadProgressText: {
+    fontSize: 14,
+    color: Colors.primary,
+    textAlign: 'center',
+    marginTop: 10,
   },
 })
 

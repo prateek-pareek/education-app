@@ -3,10 +3,10 @@ import React from 'react'
 import {Colors} from '../../utils/Colors'
 import CommentSection from '../../components/commentSection'
 
-const CommentScreen = () => {
+const CommentScreen = ({route}) => {
   return (
     <ScrollView style={styles.homeContainer}>
-      <CommentSection />
+      <CommentSection route={route} />
     </ScrollView>
   )
 }

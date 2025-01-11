@@ -7,27 +7,8 @@ import {PostData} from '../data/PostData'
 import CommentSection from './commentSection'
 import axios from 'axios'
 
-const Post = () => {
-  const [posts, setPosts] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.baseUrl}api/posts/getPosts`,
-        )
-        setPosts(response.data)
-      } catch (error) {
-        console.error('Error fetching posts:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchPosts()
-  }, [])
-
+const Post = ({posts}) => {
+  const [loading, setLoading] = useState(false)
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -37,10 +18,10 @@ const Post = () => {
   }
   return (
     <View style={styles.postContainer}>
-      {PostData.map(item => (
+      {posts.map(item => (
         <View key={item.id}>
           <PostHeader data={item} />
-          <Image source={item?.mediaUrl} style={styles.postImg} />
+          <Image source={{uri: item?.mediaUrl}} style={styles.postImg} />
           <PostFooter data={item} />
         </View>
       ))}
