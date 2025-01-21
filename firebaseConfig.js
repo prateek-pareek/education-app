@@ -5,18 +5,18 @@ import { initializeApp } from 'firebase/app'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyDo99J0800ioPZ8HOkDZE_5DnXtRZYaV6o',
-  authDomain: 'skillconnect-34ad9.firebaseapp.com',
-  projectId: 'skillconnect-34ad9',
-  storageBucket: 'skillconnect-34ad9.firebasestorage.app',
-  messagingSenderId: '477322964738',
-  appId: '1:477322964738:web:477cfd428a03d9e93f5c1b',
-  measurementId: 'G-0P29H95E96',
-}
+  apiKey: "AIzaSyAk8EoMhJjZkV917dN84F8Dt1308MynBCA",
+  authDomain: "skillconnect-8fd96.firebaseapp.com",
+  projectId: "skillconnect-8fd96",
+  storageBucket: "skillconnect-8fd96.firebasestorage.app",
+  messagingSenderId: "553487939376",
+  appId: "1:553487939376:web:c6618802290e487797faf5",
+  measurementId: "G-G531KYMTH0"
+};
+
 
 const app = initializeApp(firebaseConfig)
 
-// Initialize auth with AsyncStorage persistence
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage)
 })
