@@ -29,7 +29,7 @@ const SignInScreen = ({navigation}) => {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        '477322964738-t8f6a1l19m9nnvmcjvv8mra2uo1ughs1.apps.googleusercontent.com',
+        '77322964738-t8f6a1l19m9nnvmcjvv8mra2uo1ughs1.apps.googleusercontent.com',
     })
   }, [])
 
