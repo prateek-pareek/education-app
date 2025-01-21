@@ -76,7 +76,6 @@ const SignInScreen = ({navigation}) => {
   }
 
   const handleSignIn = () => {
-    // Handle sign-in logic
     console.log('Signing In with:', {email, password, rememberMe})
   }
 
@@ -152,23 +151,16 @@ const SignInScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      {/* Logo Section */}
       <View style={styles.logoContainer}>
-        {/* <Image
-          source={require('./path-to-your-logo.png')} // Replace with your logo path
-          style={styles.logo}
-        /> */}
         <Text style={styles.logoText}>EDUPRO</Text>
         <Text style={styles.logoSubText}>LEARN FROM HOME</Text>
       </View>
 
-      {/* Title Section */}
       <Text style={styles.title}>Let's Sign In.!</Text>
       <Text style={styles.subtitle}>
         Login to Your Account to Continue your Courses
       </Text>
 
-      {/* Email Input */}
       <View style={styles.inputContainer}>
         <Icon name='email-outline' size={20} color='#7D7D7D' />
         <TextInput
@@ -181,7 +173,7 @@ const SignInScreen = ({navigation}) => {
         />
       </View>
 
-      {/* Password Input */}
+      
       <View style={styles.inputContainer}>
         <Icon name='lock-outline' size={20} color='#7D7D7D' />
         <TextInput

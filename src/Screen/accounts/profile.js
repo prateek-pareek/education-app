@@ -29,9 +29,7 @@ const EditProfileScreen = () => {
     })
   }
 
-  // Function to handle form submission (e.g., save data)
   const handleSave = () => {
-    // Here you can handle saving the data (e.g., send to backend)
     Alert.alert(
       'Profile Updated',
       'Your profile information has been updated successfully!',
