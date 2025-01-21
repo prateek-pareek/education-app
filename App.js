@@ -61,8 +61,8 @@ const Tab = createBottomTabNavigator()
 const AppNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName='MainScreen'
-      // initialRouteName='SignUp2'
+      // initialRouteName='MainScreen'
+      initialRouteName='SignUp2'
       screenOptions={{headerShown: false}}>
       <Stack.Screen name='Login' component={Login} />
       <Stack.Screen name='SignUp' component={SignUpScreen} />

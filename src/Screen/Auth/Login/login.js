@@ -17,6 +17,7 @@ import {
 } from '../../../../firebaseConfig'
 import {signInWithEmailAndPassword, signInWithCredential} from 'firebase/auth'
 import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 const SignInScreen = ({navigation}) => {
@@ -32,6 +33,48 @@ const SignInScreen = ({navigation}) => {
     })
   }, [])
 
+
+
+  // commonApi
+  const API_URL = 'https://education-backend-jade.vercel.app/api/auth/login'
+  const loginUser = async (email, password, provider, token) => {
+    try {
+      const data = { email, password, provider }
+      if (token) {
+        data.providerToken = token
+      }
+      const response = await axios.post(`${API_URL}`, data, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      const authToken = response.data?.token || null
+      const userDetails = response.data?.user || null
+
+      if (!authToken || !userDetails) {
+        console.error('Missing required fields in API response')
+        return
+      }
+      AsyncStorage.clear()
+      AsyncStorage.setItem('authToken', authToken)
+      AsyncStorage.setItem('userDetails', JSON.stringify(userDetails))
+      AsyncStorage.setItem('isLoggedIn', 'true')
+      navigation.navigate("MainScreen")
+
+      // return response.data
+    } catch (error) {
+      console.error(
+        'Login API Error:',
+        error.response ? error.response.data : error.message
+      )
+      toast.error('You have not signed up, please sign up first')
+      if (error.response.data.message === 'User does not exist.') {
+        navigate('/signup')
+      }
+      throw error
+    }
+  }
+
   const handleSignIn = () => {
     // Handle sign-in logic
     console.log('Signing In with:', {email, password, rememberMe})
@@ -39,32 +82,17 @@ const SignInScreen = ({navigation}) => {
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      const userCredential= await signInWithEmailAndPassword(auth, email, password)
+      const User = userCredential.user
 
-      let data = JSON.stringify({
-        email: email,
-        password: password,
-        role: 'Learner',
-      })
 
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: `${process.env.baseUrl}api/auth/login`,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        data: data,
-      }
-      axios
-        .request(config)
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          navigation.navigate('MainScreen')
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      const loginResponse = await loginUser(
+        User.email,
+        password,
+        'email',
+        User.accessToken
+      )
+           
 
       Alert.alert('Login Success', `Logged in with email: ${email}`)
     } catch (error) {
@@ -76,8 +104,17 @@ const SignInScreen = ({navigation}) => {
     try {
       const {idToken} = await GoogleSignin.signIn()
       const googleCredential = googleProvider.credential(idToken)
-      await signInWithCredential(auth, googleCredential)
+      const response= await  signInWithCredential(auth, googleCredential)
+      console.log("response:", response)
+      const loginResponse = await loginUser(
+        googleCredential.email,
+        null,
+        'google',
+        User.accessToken
+        // idToken
+      )
       Alert.alert('Google Login', 'Logged in successfully via Google')
+      navigation.navigate("MainScreen")
     } catch (error) {
       Alert.alert('Google Login Failed', error.message)
     }

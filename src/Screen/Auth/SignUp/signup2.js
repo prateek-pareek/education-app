@@ -26,6 +26,7 @@ import {
   facebookProvider,
 } from '../../../../firebaseConfig'
 import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const SignUpScreen2 = ({navigation}) => {
   const [email, setEmail] = useState('')
@@ -41,27 +42,63 @@ const SignUpScreen2 = ({navigation}) => {
     })
   }, [])
 
-  useEffect(() => {
-    const handleDeepLink = ({url}) => {
-      if (url && url.includes('code=')) {
-        const code = url.split('code=')[1].split('&')[0]
-        handleLinkedInCode(code)
+  // useEffect(() => {
+  //   const handleDeepLink = ({url}) => {
+  //     if (url && url.includes('code=')) {
+  //       const code = url.split('code=')[1].split('&')[0]
+  //       handleLinkedInCode(code)
+  //     }
+  //   }
+
+  //   Linking.addEventListener('url', handleDeepLink)
+
+  //   Linking.getInitialURL().then(url => {
+  //     if (url) {
+  //       handleDeepLink({url})
+  //     }
+  //   })
+
+  //   return () => {
+  //     // Clean up
+  //     Linking.removeEventListener('url', handleDeepLink)
+  //   }
+  // }, [])
+
+
+
+  const API_URL = 'https://education-backend-jade.vercel.app/api/auth/signup';
+  const signupUser = async (email, password, role, provider, token, displayName, profileImage) => {
+    try {
+      const data = JSON.stringify({
+        "email": email,
+        "password": password,
+        "role": role,
+        "provider": provider,
+        "providerToken": token,
+        "displayName": displayName,
+        "profileImage": profileImage,
+      });
+      // console.log('data', data);
+      const response = await axios.post(`${API_URL}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        maxBodyLength: Infinity,
+      });
+      console.log('response backend', response);
+      return response.data; // Return the response data (you can check success status here)
+    } catch (error) {
+      console.error("Signup API Error:", error);
+    
+      toast.error(error?.response?.data?.message || "Signup failed. Please try again.");
+
+      if(error?.response?.data?.message === "User already exists."){
+        navigate('/login')
       }
-    }
-
-    Linking.addEventListener('url', handleDeepLink)
-
-    Linking.getInitialURL().then(url => {
-      if (url) {
-        handleDeepLink({url})
-      }
-    })
-
-    return () => {
-      // Clean up
-      Linking.removeEventListener('url', handleDeepLink)
-    }
-  }, [])
+   
+    return { error: true, message: error?.response?.data?.message || "Signup failed." };
+  }
+  };
 
   const handleSignUp = async () => {
     if (!email || !password) {
@@ -74,34 +111,29 @@ const SignUpScreen2 = ({navigation}) => {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
-
-      let data = JSON.stringify({
-        email: email,
-        password: password,
-        role: 'Learner',
-        provider: 'email',
-      })
-
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: 'https://education-backend-jade.vercel.app/api/auth/signup',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        data: data,
+      const result = await createUserWithEmailAndPassword(auth, email, password)
+      const User = result.user
+      const role = 'user'
+      // const password = 'password'
+      const displayName = User.displayName
+      const profileImage = User.photoURL
+      const response = await signupUser(
+        email,
+        password,
+        'user',
+        'email',
+        User.accessToken,
+        displayName,
+        profileImage
+      ) 
+      if (response?.user?.uid) {
+        AsyncStorage.setItem('isLoggedIn', 'true')
+        AsyncStorage.setItem('userToken', response.token)
+        navigation.navigate('MainScreen')
+      } else {
+        console.log('Error in response: ', response)
       }
-
-      axios
-        .request(config)
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          navigation.navigate('Login')
-        })
-        .catch(error => {
-          console.log(error)
-        })
+     
     } catch (error) {
       Alert.alert('Error', error.message)
     }
@@ -111,9 +143,28 @@ const SignUpScreen2 = ({navigation}) => {
     try {
       const {idToken} = await GoogleSignin.signIn() // Google sign-in
       const googleCredential = googleProvider.credential(idToken) // Firebase credential
-      await signInWithCredential(auth, googleCredential) // Firebase sign-up
-      Alert.alert('Success', 'Account created using Google!')
-      navigation.navigate('Login')
+     const result= await signInWithCredential(auth, googleCredential) // Firebase sign-up 
+     const User = result.user
+      const role = 'user'
+      const password = 'password'
+      const displayName = User.displayName
+      const profileImage = User.photoURL
+      const response = await signupUser(
+        User.email,
+        null,
+        'user',
+        'google',
+        User.accessToken,
+        displayName,
+        profileImage
+      ) 
+      if (response?.user?.uid) {
+        AsyncStorage.setItem('isLoggedIn', 'true')
+        AsyncStorage.setItem('userToken', response.token)
+        navigation.navigate('MainScreen')
+      } else {
+        console.log('Error in response: ', response)
+      }
     } catch (error) {
       Alert.alert('Google Sign-Up Failed', error.message)
     }
@@ -278,6 +329,13 @@ const SignUpScreen2 = ({navigation}) => {
           <View style={styles.dividerContainer}>
             <Text style={styles.dividerText}>Or Continue With</Text>
           </View>
+          {/* Go to Login Button */}
+          <TouchableOpacity
+            style={styles.goToLoginButton}
+            onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.goToLoginButtonText}>Go to Login</Text>
+          </TouchableOpacity>
+
 
           {/* Social Buttons */}
           <View style={styles.socialButtonsContainer}>
