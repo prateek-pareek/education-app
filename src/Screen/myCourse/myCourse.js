@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   StyleSheet,
@@ -7,6 +8,7 @@ import {
   TextInput,
   FlatList,
 } from 'react-native'
+import { Image } from 'react-native-svg'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const completedCoursesData = [
@@ -61,17 +63,52 @@ const ongoingCoursesData = [
   },
 ]
 
-const MyCoursesScreen = ({navigation}) => {
+
+
+const MyCoursesScreen = ({ navigation }) => {
+
   const [activeTab, setActiveTab] = useState('Completed')
   const [searchText, setSearchText] = useState('')
+  const [courses, setCourses] = useState([]);
 
-  const renderCourseCard = ({item, navigations}) => (
+
+  
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NTQ2NTQ3LCJleHAiOjE3Mzc2MzI5NDd9.8VpzcEto2UVAbusutKoC5DStnedWfEcc3FebsThXyOM";
+      try {
+        const response = await axios.get('https://education-backend-jade.vercel.app/api/course', {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
+        });
+        console.log("responfdbrg",response.data);
+        // Add static data for ratings and reviews
+        const coursesWithStaticData = response.data.map(course => ({
+          ...course,
+          rating: Math.floor(Math.random() * 5) + 1, // Random rating between 1 and 5
+          students: '1000 Std', // Static students count
+          bookmarked: false, // Static bookmarked status
+        }));
+        setCourses(coursesWithStaticData);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchCourses();
+  }, []);
+
+  const renderCourseCard = ({ item, navigations }) => (
     <View style={styles.courseCard}>
       <View style={styles.courseImagePlaceholder} />
       <View style={styles.courseContent}>
         <Text style={styles.courseCategory}>{item.category}</Text>
         <Text style={styles.courseTitle} numberOfLines={1}>
-          {item.title}
+          {item?.title}
         </Text>
         <View style={styles.courseMeta}>
           <Icon name='star' size={16} color='#FFC107' />
@@ -99,7 +136,7 @@ const MyCoursesScreen = ({navigation}) => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Courses</Text>
+        <Text style={styles.headerTitle}>My Coursess</Text>
       </View>
 
       {/* Search Bar */}
@@ -162,10 +199,10 @@ const MyCoursesScreen = ({navigation}) => {
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* list */}
       <FlatList
-        data={
-          activeTab === 'Completed' ? completedCoursesData : ongoingCoursesData
-        }
+        data={courses}
         keyExtractor={item => item.id}
         renderItem={item => renderCourseCard(item, navigation)}
         contentContainerStyle={styles.courseList}
@@ -183,7 +220,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    textAlign:"center",
+    textAlign: "center",
     paddingHorizontal: 16,
     marginTop: 16,
   },

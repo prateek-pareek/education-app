@@ -3,6 +3,7 @@ import React from 'react'
 import UserProfile from '../../public/images/post1.jpeg'
 import {Colors} from '../utils/Colors'
 import VectorIcon from '../utils/VectorIcon'
+import { formatTimeAgo } from './FormatTimeAgo'
 
 const PostHeader = ({data}) => {
   return (
@@ -16,7 +17,7 @@ const PostHeader = ({data}) => {
           <View style={styles.userSection}>
             <Text style={styles.username}>{data?.user?.username || 'Test'}</Text>
             <View style={styles.row}>
-              <Text style={styles.days}>{data?.createdAt || 'bkjhk'}</Text>
+              <Text style={styles.days}>{formatTimeAgo(data?.createdAt)}</Text>
               <Text style={styles.dot}>•</Text>
               <VectorIcon
                 name='user-friends'

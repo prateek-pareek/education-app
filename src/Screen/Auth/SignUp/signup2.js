@@ -1,122 +1,87 @@
-import React, {useState, useEffect} from 'react'
-// import WebView from 'react-native-webview';
-import {OAuthProvider} from 'firebase/auth'
+import React, { useState, useEffect } from 'react';
 import {
   View,
-  StyleSheet,
   Text,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
   Image,
-  Linking,
-} from 'react-native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithCredential,
-} from 'firebase/auth'
-import {GoogleSignin} from '@react-native-google-signin/google-signin'
-import {LoginManager, AccessToken} from 'react-native-fbsdk-next'
-
+  Alert,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 import {
   auth,
   googleProvider,
   facebookProvider,
-} from '../../../../firebaseConfig'
-import axios from 'axios'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+} from '../../../../firebaseConfig';
+import {
+  createUserWithEmailAndPassword,
+  signInWithCredential,
+} from 'firebase/auth';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const SignUpScreen2 = ({navigation}) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [passwordVisible, setPasswordVisible] = useState(false)
-  const [isChecked, setIsChecked] = useState(false)
-  // const [showLinkedInModal, setShowLinkedInModal] = useState(false);
+const SignUpScreen2 = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
         '77322964738-t8f6a1l19m9nnvmcjvv8mra2uo1ughs1.apps.googleusercontent.com',
-    })
-  }, [])
-
-  // useEffect(() => {
-  //   const handleDeepLink = ({url}) => {
-  //     if (url && url.includes('code=')) {
-  //       const code = url.split('code=')[1].split('&')[0]
-  //       handleLinkedInCode(code)
-  //     }
-  //   }
-
-  //   Linking.addEventListener('url', handleDeepLink)
-
-  //   Linking.getInitialURL().then(url => {
-  //     if (url) {
-  //       handleDeepLink({url})
-  //     }
-  //   })
-
-  //   return () => {
-  //     // Clean up
-  //     Linking.removeEventListener('url', handleDeepLink)
-  //   }
-  // }, [])
-
-
+    });
+  }, []);
 
   const API_URL = 'https://education-backend-jade.vercel.app/api/auth/signup';
   const signupUser = async (email, password, role, provider, token, displayName, profileImage) => {
     try {
       const data = JSON.stringify({
-        "email": email,
-        "password": password,
-        "role": role,
-        "provider": provider,
-        "providerToken": token,
-        "displayName": displayName,
-        "profileImage": profileImage,
+        email: email,
+        password: password,
+        role: role,
+        provider: provider,
+        providerToken: token,
+        displayName: displayName,
+        profileImage: profileImage,
       });
-      // console.log('data', data);
       const response = await axios.post(`${API_URL}`, data, {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         maxBodyLength: Infinity,
       });
       console.log('response backend', response);
-      return response.data; // Return the response data (you can check success status here)
+      return response.data;
     } catch (error) {
-      console.error("Signup API Error:", error);
-    
-      toast.error(error?.response?.data?.message || "Signup failed. Please try again.");
-
-      if(error?.response?.data?.message === "User already exists."){
-        navigate('/login')
+      console.error('Signup API Error:', error);
+      Alert.alert('Error', error?.response?.data?.message || 'Signup failed. Please try again.');
+      if (error?.response?.data?.message === 'User already exists.') {
+        navigation.navigate('Login');
       }
-   
-    return { error: true, message: error?.response?.data?.message || "Signup failed." };
-  }
+      return { error: true, message: error?.response?.data?.message || 'Signup failed.' };
+    }
   };
 
   const handleSignUp = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields')
-      return
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
     }
     if (!isChecked) {
-      Alert.alert('Error', 'You must agree to the terms and conditions')
-      return
+      Alert.alert('Error', 'You must agree to the terms and conditions');
+      return;
     }
 
     try {
-      const result = await createUserWithEmailAndPassword(auth, email, password)
-      const User = result.user
-      const role = 'user'
-      // const password = 'password'
-      const displayName = User.displayName
-      const profileImage = User.photoURL
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const User = result.user;
+      const role = 'user';
+      const displayName = User.displayName;
+      const profileImage = User.photoURL;
       const response = await signupUser(
         email,
         password,
@@ -125,30 +90,28 @@ const SignUpScreen2 = ({navigation}) => {
         User.accessToken,
         displayName,
         profileImage
-      ) 
+      );
       if (response?.user?.uid) {
-        AsyncStorage.setItem('isLoggedIn', 'true')
-        AsyncStorage.setItem('userToken', response.token)
-        navigation.navigate('MainScreen')
+        AsyncStorage.setItem('isLoggedIn', 'true');
+        AsyncStorage.setItem('userToken', response.token);
+        navigation.navigate('MainScreen');
       } else {
-        console.log('Error in response: ', response)
+        console.log('Error in response: ', response);
       }
-     
     } catch (error) {
-      Alert.alert('Error', error.message)
+      Alert.alert('Error', error.message);
     }
-  }
+  };
 
   const handleGoogleSignUp = async () => {
     try {
-      const {idToken} = await GoogleSignin.signIn() // Google sign-in
-      const googleCredential = googleProvider.credential(idToken) // Firebase credential
-     const result= await signInWithCredential(auth, googleCredential) // Firebase sign-up 
-     const User = result.user
-      const role = 'user'
-      const password = 'password'
-      const displayName = User.displayName
-      const profileImage = User.photoURL
+      const { idToken } = await GoogleSignin.signIn();
+      const googleCredential = googleProvider.credential(idToken);
+      const result = await signInWithCredential(auth, googleCredential);
+      const User = result.user;
+      const role = 'user';
+      const displayName = User.displayName;
+      const profileImage = User.photoURL;
       const response = await signupUser(
         User.email,
         null,
@@ -157,401 +120,242 @@ const SignUpScreen2 = ({navigation}) => {
         User.accessToken,
         displayName,
         profileImage
-      ) 
+      );
       if (response?.user?.uid) {
-        AsyncStorage.setItem('isLoggedIn', 'true')
-        AsyncStorage.setItem('userToken', response.token)
-        navigation.navigate('MainScreen')
+        AsyncStorage.setItem('isLoggedIn', 'true');
+        AsyncStorage.setItem('userToken', response.token);
+        navigation.navigate('MainScreen');
       } else {
-        console.log('Error in response: ', response)
+        console.log('Error in response: ', response);
       }
     } catch (error) {
-      Alert.alert('Google Sign-Up Failed', error.message)
+      Alert.alert('Google Sign-Up Failed', error.message);
     }
-  }
+  };
 
-  const handleLinkedInSignUp = async () => {
+  const handleFacebookSignUp = async () => {
     try {
-      const linkedInAuthUrl = 'https://www.linkedin.com/oauth/v2/authorization'
-      const clientId = '78888qogxla3v4'
-      const redirectUri = 'edupro://callback'
-      const scope = 'r_liteprofile r_emailaddress'
-
-      const authUrl = `${linkedInAuthUrl}?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
-        redirectUri,
-      )}&scope=${scope}`
-
-      const supported = await Linking.canOpenURL(authUrl)
-      if (supported) {
-        await Linking.openURL(authUrl)
-      } else {
-        Alert.alert('Error', 'Cannot open LinkedIn authentication')
+      const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+      if (result.isCancelled) {
+        Alert.alert('Login Canceled', 'User canceled the login process.');
+        return;
       }
+
+      const accessToken = await AccessToken.getCurrentAccessToken();
+      if (!accessToken) {
+        Alert.alert('Error', 'Could not obtain access token.');
+        return;
+      }
+      const facebookCredential = facebookProvider.credential(accessToken.accessToken);
+      await signInWithCredential(auth, facebookCredential);
+      Alert.alert('Login Success', 'Logged in successfully via Facebook!');
     } catch (error) {
-      Alert.alert('LinkedIn Sign-Up Failed', error.message)
+      console.error('Facebook Login Error:', error);
+      Alert.alert('Facebook Login Failed', error.message || 'Something went wrong.');
     }
-  }
-
-  //   linked in signup
-  const handleLinkedInCode = async code => {
-    try {
-      const tokenUrl = 'https://www.linkedin.com/oauth/v2/accessToken'
-      const clientId = '78888qogxla3v4'
-      const clientSecret = 'WPL_AP1.xt5nASWM5rB1pxVb.q+JmqA=='
-      const redirectUri = 'edupro://callback' // Make sure this matches
-
-      const params = new URLSearchParams({
-        grant_type: 'authorization_code',
-        code: code,
-        redirect_uri: redirectUri,
-        client_id: clientId,
-        client_secret: clientSecret,
-      })
-
-      const response = await fetch(tokenUrl, {
-        method: 'POST',
-        body: params.toString(),
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      })
-
-      const data = await response.json()
-
-      if (data.access_token) {
-        const linkedInProvider = new OAuthProvider('linkedin.com')
-        const credential = linkedInProvider.credential(data.access_token)
-        await signInWithCredential(auth, credential)
-        navigation.navigate('MainScreen')
-      } else {
-        throw new Error('Failed to get access token')
-      }
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        'Failed to complete LinkedIn sign-up: ' + error.message,
-      )
-    }
-  }
-
-  const handleWebViewNavigationStateChange = newNavState => {
-    const {url} = newNavState
-    if (url && url.includes('code=')) {
-      const code = url.split('code=')[1].split('&')[0]
-      if (code) {
-        handleLinkedInCode(code)
-      }
-    }
-  }
+  };
 
   return (
     <View style={styles.container}>
-      {/* Logo and Title Section */}
       <View style={styles.logoContainer}>
-        <Image
-          //   source={require('./assets/edupro-logo.png')}
-          source={require('../../../../public/images/edupro-logo.png')}
-          style={styles.logo}
-          resizeMode='contain'
+        <Text style={styles.logoText}>EDUPRO</Text>
+        <Text style={styles.logoSubText}>LEARN FROM HOME</Text>
+      </View>
+
+      <Text style={styles.title}>Getting Started.!</Text>
+      <Text style={styles.subtitle}>Create an Account to Continue your allCourses</Text>
+
+      <View style={styles.inputContainer}>
+        <Icon name='email-outline' size={20} color='#7D7D7D' />
+        <TextInput
+          style={styles.input}
+          placeholder='Email'
+          value={email}
+          onChangeText={setEmail}
+          keyboardType='email-address'
+          placeholderTextColor='#7D7D7D'
         />
-        {/* <Text style={styles.appName}>EDUPRO</Text> */}
-        {/* <Text style={styles.subtitle}>LEARN FROM HOME</Text> */}
       </View>
 
-      {/* Main Content */}
-      <View style={styles.mainContent}>
-        <Text style={styles.title}>Getting Started.!</Text>
-        <Text style={styles.description}>
-          Create an Account to Continue your allCourses
-        </Text>
-
-        {/* Form Fields */}
-        <View style={styles.inputContainer}>
-          <View style={styles.inputWrapper}>
-            <Icon
-              name='email-outline'
-              size={24}
-              color='#666'
-              style={styles.inputIcon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder='Email'
-              value={email}
-              onChangeText={setEmail}
-              keyboardType='email-address'
-              autoCapitalize='none'
-            />
-          </View>
-
-          <View style={styles.inputWrapper}>
-            <Icon
-              name='lock-outline'
-              size={24}
-              color='#666'
-              style={styles.inputIcon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder='Password'
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!passwordVisible}
-            />
-            <TouchableOpacity
-              onPress={() => setPasswordVisible(!passwordVisible)}
-              style={styles.eyeIcon}>
-              <Icon
-                name={passwordVisible ? 'eye-off-outline' : 'eye-outline'}
-                size={24}
-                color='#666'
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* Terms and Conditions */}
-          <TouchableOpacity
-            style={styles.termsContainer}
-            onPress={() => setIsChecked(!isChecked)}>
-            <View style={styles.checkbox}>
-              {isChecked && <Icon name='check' size={16} color='#fff' />}
-            </View>
-            <Text style={styles.termsText}>Agree to Terms & Conditions</Text>
-          </TouchableOpacity>
-
-          {/* Sign Up Button */}
-          <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
-            <Text style={styles.signUpButtonText}>Sign Up</Text>
-            <Icon name='arrow-right' size={24} color='#fff' />
-          </TouchableOpacity>
-
-          {/* Or Continue With */}
-          <View style={styles.dividerContainer}>
-            <Text style={styles.dividerText}>Or Continue With</Text>
-          </View>
-          {/* Go to Login Button */}
-          <TouchableOpacity
-            style={styles.goToLoginButton}
-            onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.goToLoginButtonText}>Go to Login</Text>
-          </TouchableOpacity>
-
-
-          {/* Social Buttons */}
-          <View style={styles.socialButtonsContainer}>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={handleGoogleSignUp}>
-              <Image
-                source={require('../../../../public/images/google-icon.png')}
-                style={styles.socialIcon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <Image
-                source={require('../../../../public/images/fb-icon.png')}
-                style={styles.socialIcon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={handleLinkedInSignUp}>
-              <Image
-                source={require('../../../../public/images/linkdin-logo.png')}
-                style={styles.socialIcon}
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* Sign In Link */}
-          <View style={styles.signInContainer}>
-            <Text style={styles.signInText}>Already have an Account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.signInLink}>SIGN IN</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+      <View style={styles.inputContainer}>
+        <Icon name='lock-outline' size={20} color='#7D7D7D' />
+        <TextInput
+          style={styles.input}
+          placeholder='Password'
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+          placeholderTextColor='#7D7D7D'
+        />
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <Icon
+            name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+            size={20}
+            color='#7D7D7D'
+          />
+        </TouchableOpacity>
       </View>
-      {/* {showLinkedInModal && (
-                <View style={styles.webviewContainer}>
-                    <WebView
-                        source={{ uri: handleLinkedInSignUp() }}
-                        onNavigationStateChange={handleWebViewNavigationStateChange}
-                        startInLoadingState={true}
-                        javaScriptEnabled={true}
-                        domStorageEnabled={true}
-                    />
-                    <TouchableOpacity
-                        style={styles.closeButton}
-                        onPress={() => setShowLinkedInModal(false)}>
-                        <Text style={styles.closeButtonText}>Close</Text>
-                    </TouchableOpacity>
-                </View>
-            )} */}
+
+      <View style={styles.optionsContainer}>
+        <TouchableOpacity style={styles.rememberMeContainer} onPress={() => setIsChecked(!isChecked)}>
+          <View style={styles.checkbox}>
+            {isChecked && <Icon name='check' size={16} color='#0047FF' />}
+          </View>
+          <Text style={styles.rememberMeText}>Agree to Terms & Conditions</Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
+        <Text style={styles.signUpButtonText}>Sign Up</Text>
+        <Icon name='arrow-right' size={24} color='#FFFFFF' />
+      </TouchableOpacity>
+
+      <Text style={styles.orText}>Or Continue With</Text>
+      <View style={styles.socialContainer}>
+        <TouchableOpacity style={styles.socialButton} onPress={handleGoogleSignUp}>
+          <Icon name='google' size={20} color='#EA4335' />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.socialButton} onPress={handleFacebookSignUp}>
+          <Icon name='facebook' size={20} color='#1877F2' />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.socialButton} onPress={handleFacebookSignUp}>
+          <Icon name='linkedin' size={20} color='#0077B5' />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.signUpContainer}>
+        <Text style={styles.signUpText}>Already have an Account? </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.signUpLink}>SIGN IN</Text>
+        </TouchableOpacity>
+      </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F6F9FC',
+    paddingHorizontal: 16,
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 60,
-    marginBottom: 30,
+    marginVertical: 32,
   },
-  logo: {
-    width: 80,
-    height: 80,
-  },
-  appName: {
+  logoText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000080',
-    marginTop: 10,
+    color: '#0047FF',
+    marginTop: 8,
+  },
+  logoSubText: {
+    fontSize: 14,
+    color: '#7D7D7D',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1D1D1D',
+    marginBottom: 4,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
-  },
-  mainContent: {
-    flex: 1,
-    paddingHorizontal: 30,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#000080',
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 30,
+    color: '#7D7D7D',
+    textAlign: 'center',
+    marginBottom: 32,
   },
   inputContainer: {
-    gap: 20,
-  },
-  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 30,
-    paddingHorizontal: 20,
-    height: 60,
-  },
-  inputIcon: {
-    marginRight: 10,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    height: 48,
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
+    color: '#1D1D1D',
+    marginLeft: 8,
   },
-  eyeIcon: {
-    padding: 5,
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
   },
-  termsContainer: {
+  rememberMeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 10,
   },
   checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#4CAF50',
-    backgroundColor: '#4CAF50',
-    alignItems: 'center',
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderRadius: 4,
     justifyContent: 'center',
-    marginRight: 10,
+    alignItems: 'center',
+    marginRight: 8,
   },
-  termsText: {
-    fontSize: 16,
-    color: '#666',
+  rememberMeText: {
+    fontSize: 14,
+    color: '#7D7D7D',
   },
   signUpButton: {
-    backgroundColor: '#0066ff',
-    borderRadius: 30,
-    height: 60,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    alignItems: 'center',
+    backgroundColor: '#0047FF',
+    paddingVertical: 14,
+    borderRadius: 50,
+    marginBottom: 16,
   },
   signUpButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginRight: 10,
-  },
-  dividerContainer: {
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  dividerText: {
-    color: '#666',
     fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginRight: 8,
   },
-  socialButtonsContainer: {
+  orText: {
+    fontSize: 14,
+    color: '#7D7D7D',
+    textAlign: 'center',
+    marginVertical: 16,
+  },
+  socialContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 20,
+    marginBottom: 16,
   },
   socialButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 8,
+    elevation: 2,
   },
-  socialIcon: {
-    width: 24,
-    height: 24,
-  },
-  signInContainer: {
+  signUpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 30,
   },
-  signInText: {
-    fontSize: 16,
-    color: '#666',
+  signUpText: {
+    fontSize: 14,
+    color: '#7D7D7D',
   },
-  signInLink: {
-    fontSize: 16,
-    color: '#0066ff',
+  signUpLink: {
+    fontSize: 14,
     fontWeight: 'bold',
+    color: '#0047FF',
   },
+});
 
-  // new
-  // webviewContainer: {
-  //     position: 'absolute',
-  //     top: 0,
-  //     left: 0,
-  //     right: 0,
-  //     bottom: 0,
-  //     backgroundColor: 'white',
-  //     zIndex: 999,
-  //   },
-  //   closeButton: {
-  //     position: 'absolute',
-  //     top: 40,
-  //     right: 20,
-  //     padding: 10,
-  //     backgroundColor: '#0066ff',
-  //     borderRadius: 5,
-  //   },
-  //   closeButtonText: {
-  //     color: 'white',
-  //     fontWeight: 'bold',
-  //   },
-})
-
-export default SignUpScreen2
+export default SignUpScreen2;

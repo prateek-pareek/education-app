@@ -1,19 +1,49 @@
-import {View, Text, Image, StyleSheet} from 'react-native';
-import React from 'react';
-import {Colors} from '../utils/Colors';
-import {StoryData} from '../data/StoryData';
+import { View, Text, Image, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Colors } from '../utils/Colors';
+import { StoryData } from '../data/StoryData';
+import axios from 'axios';
 
 const FriendStories = () => {
+  const [stories, setStories] = useState([]);
+
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NTI3NjMwLCJleHAiOjE3Mzc2MTQwMzB9.uCRtdYglTseu4FqFZYxK9g03w_VDlE0hSFU23YydmcY";
+
+  // Fetch all stories
+  useEffect(() => {
+    const getStories = async () => {
+      let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: 'https://education-backend-jade.vercel.app/api/story/display',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      };
+      axios
+        .request(config)
+        .then(response => {
+          console.log('Fetched stories:', response.data); // Inspect the structure here
+          // Adjust based on the actual structure
+          setStories(response.data.stories || response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    };
+    getStories();
+  }, [token]);
+
   return (
     <>
-      {StoryData.map(item => (
-        <View key={item.id} style={styles.friendStoryContainer}>
-          <Image source={item.storyImg} style={styles.storyImg} />
+      {stories.map((item, index) => (
+        <View key={item.id || index} style={styles.friendStoryContainer}>
+          <Image source={{ uri: item.user.profileImageURL }} style={styles.storyImg} />
           <View style={styles.profileImgContainer}>
-            <Image source={item.profileImg} style={styles.profileImg} />
+            <Image source={{ uri: item.user.profileImageURL }} style={styles.profileImg} />
           </View>
           <View style={styles.friendNameContainer}>
-            <Text style={styles.friendName}>{item.name}</Text>
+            <Text style={styles.friendName}>{item?.user.name}</Text>
           </View>
         </View>
       ))}
@@ -55,9 +85,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 8,
     bottom: 8,
+    backgroundColor: Colors.white,
   },
   friendName: {
-    color: Colors.white,
+    color: Colors.black,
     fontSize: 14,
   },
 });

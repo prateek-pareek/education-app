@@ -61,7 +61,7 @@ const SubHeader = () => {
 
       // Once upload is complete, get the download URL
       const downloadURL = await storageRef.getDownloadURL()
-      setMediaUrl(downloadURL) // Set the URL to state
+      setMediaUrl(downloadURL) /
 
       setUploading(false)
       Alert.alert('Upload successful!', 'Your media has been uploaded.')
@@ -80,19 +80,21 @@ const SubHeader = () => {
       //   Alert.alert('Please fill out all fields');
       //   return;
       // }
+      const config = {
+        method: 'post',
+        url: 'https://education-backend-jade.vercel.app/api/posts/create',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NTI3NjMwLCJleHAiOjE3Mzc2MTQwMzB9.uCRtdYglTseu4FqFZYxK9g03w_VDlE0hSFU23YydmcY`,
+        },
+        data: {
+          content:postContent,
+          mediaUrl:"https://loremflickr.com/cache/resized/defaultImage.small_320_240_nofilter.jpg" 
+        }
+      };
 
-      const response = await axios.post(
-        `https://education-backend-jade.vercel.app/api/posts/create`,
-        {
-          content: postContent,
-          mediaUrl: mediaUrl || 'https://loremflickr.com/320/240/dog',
-        },
-        {
-          headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ3cng5OHhlNkhxYlJVV1BzaGlTRUVWdmF4QzMyIiwiZW1haWwiOiJnb3ZpbmRzaGFybWEud2V2b2lzQGdtYWlsLmNvbSIsImlhdCI6MTczNjU5NjI4MiwiZXhwIjoxNzM2NjgyNjgyfQ.0Psvxvf8HXia8bjYHEYDXp2-Q3jI3kghFS2RAz2JfhA`,
-          },
-        },
-      )
+      const response = await axios.request(config);
+      console.log('response:',response)
       setModalVisible(false)
     } catch (error) {
       console.error('Error creating post:', error)
@@ -124,7 +126,7 @@ const SubHeader = () => {
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Text style={styles.closeButton}>X</Text>
               </TouchableOpacity>
-            </View>
+            </View> 
 
             <View style={styles.inputArea}>
               <Image source={Profile} style={styles.modalProfileStyle} />
@@ -263,10 +265,11 @@ const styles = StyleSheet.create({
   },
   addMediaButton: {
     padding: 10,
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.primaryColor,
     borderRadius: 5,
     marginBottom: 10,
     alignItems: 'center',
+    // color: Colors.black,
   },
   addMediaText: {
     color: Colors.white,

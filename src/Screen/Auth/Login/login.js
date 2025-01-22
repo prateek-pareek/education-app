@@ -69,8 +69,9 @@ const SignInScreen = ({navigation}) => {
       )
       toast.error('You have not signed up, please sign up first')
       if (error.response.data.message === 'User does not exist.') {
-        navigate('/signup')
+        navigation.navigate('/SignUp2')
       }
+      console.error(error)
       throw error
     }
   }
@@ -101,20 +102,22 @@ const SignInScreen = ({navigation}) => {
 
   const handleGoogleLogin = async () => {
     try {
-      const {idToken} = await GoogleSignin.signIn()
-      const googleCredential = googleProvider.credential(idToken)
+      const {idToken,user} = await GoogleSignin.signIn()
+      const googleCredential = googleProvider.credential(idToken,user)
       const response= await  signInWithCredential(auth, googleCredential)
       console.log("response:", response)
+      const token = result.user.accessToken
       const loginResponse = await loginUser(
         googleCredential.email,
         null,
         'google',
-        User.accessToken
+        token
         // idToken
       )
       Alert.alert('Google Login', 'Logged in successfully via Google')
       navigation.navigate("MainScreen")
     } catch (error) {
+      console.error('Google Login Error:', error)
       Alert.alert('Google Login Failed', error.message)
     }
   }
@@ -211,7 +214,7 @@ const SignInScreen = ({navigation}) => {
 
       {/* Sign In Button */}
       <TouchableOpacity style={styles.signInButton} onPress={handleLogin}>
-        <Text style={styles.signInButtonText}>Sign In</Text>
+        <Text style={styles.signInButtonText}>Log In</Text>
         <Icon name='arrow-right' size={24} color='#FFFFFF' />
       </TouchableOpacity>
 

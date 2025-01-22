@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,104 +7,87 @@ import {
   FlatList,
   Image,
   ScrollView,
-} from 'react-native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-const coursesData = [
-  {
-    id: '1',
-    category: 'Graphic Design',
-    title: 'Graphic Design Advanced',
-    price: '7058/-',
-    rating: 4.2,
-    students: '7830 Std',
-    bookmarked: true,
-  },
-  {
-    id: '2',
-    category: 'Graphic Design',
-    title: 'Advertisement Design',
-    price: '800/-',
-    rating: 3.9,
-    students: '12680 Std',
-    bookmarked: false,
-  },
-  {
-    id: '3',
-    category: 'Programming',
-    title: 'Graphic Design Advanced',
-    price: '599/-',
-    rating: 4.2,
-    students: '990 Std',
-    bookmarked: true,
-  },
-  {
-    id: '4',
-    category: 'Web Development',
-    title: 'Web Developer conce..',
-    price: '499/-',
-    rating: 4.9,
-    students: '14580 Std',
-    bookmarked: false,
-  },
-  {
-    id: '5',
-    category: 'SEO & Marketing',
-    title: 'Digital Marketing Cour...',
-    price: '999/-',
-    rating: 4.8,
-    students: '20000 Std',
-    bookmarked: false,
-  },
-]
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import axios from 'axios';
 
-const categories = ['All', 'Graphic Design', '3D Design', 'Arts & Humanities']
+const categories = ['All', 'Graphic Design', '3D Design', 'Arts & Humanities'];
 
-const PopularCoursesScreen = ({navigation}) => {
-  const [selectedCategory, setSelectedCategory] = useState('All')
-  const [courses, setCourses] = useState(coursesData)
+const PopularCoursesScreen = ({ navigation }) => {
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NTQ2NTQ3LCJleHAiOjE3Mzc2MzI5NDd9.8VpzcEto2UVAbusutKoC5DStnedWfEcc3FebsThXyOM";
+      try {
+        const response = await axios.get('https://education-backend-jade.vercel.app/api/course', {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
+        });
+        // Add static data for ratings and reviews
+        const coursesWithStaticData = response.data.map(course => ({
+          ...course,
+          rating: Math.floor(Math.random() * 5) + 1, // Random rating between 1 and 5
+          students: '1000 Std', // Static students count
+          bookmarked: false, // Static bookmarked status
+        }));
+        setCourses(coursesWithStaticData);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   // Filter courses based on selected category
   const filteredCourses =
     selectedCategory === 'All'
       ? courses
-      : courses.filter(course => course.category === selectedCategory)
+      : courses.filter(course => course.category === selectedCategory);
 
   const toggleBookmark = id => {
     setCourses(prevCourses =>
       prevCourses.map(course =>
-        course.id === id ? {...course, bookmarked: !course.bookmarked} : course,
+        course.id === id ? { ...course, bookmarked: !course.bookmarked } : course,
       ),
-    )
-  }
+    );
+  };
 
-  const renderCourseCard = ({item}) => (
-    <View style={styles.courseCard}>
-      <View style={styles.courseImagePlaceholder}>
-        {/* Placeholder for course image */}
-      </View>
-      <View style={styles.courseContent}>
-        <Text style={styles.courseCategory}>{item.category}</Text>
-        <Text style={styles.courseTitle} numberOfLines={1}>
-          {item.title}
-        </Text>
-        <Text style={styles.coursePrice}>{item.price}</Text>
-        <View style={styles.courseMeta}>
-          <Icon name='star' size={16} color='#FFC107' />
-          <Text style={styles.courseRating}>{item.rating}</Text>
-          <Text style={styles.courseStudents}>| {item.students}</Text>
+  const renderCourseCard = ({ item }) => {
+    console.log('Course Title:', item.title); // Log the title of the course
+    return (
+      <View style={styles.courseCard}>
+        <Image source={{ uri: item.mediaUrl }} style={styles.courseImagePlaceholder} />
+        <View style={styles.courseContent}>
+          <Text style={styles.courseCategory}>{item?.category}</Text>
+          <Text style={styles.courseTitle} numberOfLines={1}>
+            {item?.title}
+          </Text>
+          <Text style={styles.coursePrice}>{item?.price}</Text>
+          <View style={styles.courseMeta}>
+            <Icon name='star' size={16} color='#FFC107' />
+            <Text style={styles.courseRating}>{item.rating}</Text>
+            <Text style={styles.courseStudents}>| {item.students}</Text>
+          </View>
         </View>
+        <TouchableOpacity
+          onPress={() => toggleBookmark(item.id)}
+          style={styles.bookmarkButton}>
+          <Icon
+            name={item.bookmarked ? 'bookmark' : 'bookmark-outline'}
+            size={20}
+            color={item.bookmarked ? '#0047FF' : '#7D7D7D'}
+          />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        onPress={() => toggleBookmark(item.id)}
-        style={styles.bookmarkButton}>
-        <Icon
-          name={item.bookmarked ? 'bookmark' : 'bookmark-outline'}
-          size={20}
-          color={item.bookmarked ? '#0047FF' : '#7D7D7D'}
-        />
-      </TouchableOpacity>
-    </View>
-  )
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -112,7 +95,7 @@ const PopularCoursesScreen = ({navigation}) => {
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => {
-            navigation.goBack()
+            navigation.goBack();
           }}>
           <Icon name='arrow-left' size={28} color='#000' />
         </TouchableOpacity>
@@ -146,14 +129,14 @@ const PopularCoursesScreen = ({navigation}) => {
         ))}
       </ScrollView>
       <FlatList
-        data={filteredCourses}
+        data={courses}
         keyExtractor={item => item.id}
         renderItem={renderCourseCard}
         contentContainerStyle={styles.courseList}
       />
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -209,7 +192,6 @@ const styles = StyleSheet.create({
   courseImagePlaceholder: {
     width: 80,
     height: 80,
-    backgroundColor: '#E5E5E5',
     borderRadius: 8,
     marginRight: 16,
   },
@@ -272,6 +254,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#0047FF',
   },
-})
+});
 
-export default PopularCoursesScreen
+export default PopularCoursesScreen;
