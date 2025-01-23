@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
   TextInput,
   FlatList,
+  Image,
 } from 'react-native'
-import { Image } from 'react-native-svg'
+// import { Image } from 'react-native-svg'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const completedCoursesData = [
@@ -72,18 +73,18 @@ const MyCoursesScreen = ({ navigation }) => {
   const [courses, setCourses] = useState([]);
 
 
-  
 
+  // fetch courses api
   useEffect(() => {
     const fetchCourses = async () => {
-      const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NTQ2NTQ3LCJleHAiOjE3Mzc2MzI5NDd9.8VpzcEto2UVAbusutKoC5DStnedWfEcc3FebsThXyOM";
+      const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NjA4Mjc2LCJleHAiOjE3Mzc2OTQ2NzZ9.TGUxa0mKn3lwGT_IeupkijBtIFuP-Nwe31VX5URMEl4";
       try {
         const response = await axios.get('https://education-backend-jade.vercel.app/api/course', {
           headers: {
             Authorization: `Bearer ${authToken}`
           }
         });
-        console.log("responfdbrg",response.data);
+        // console.log("responfdbrg", response.data);
         // Add static data for ratings and reviews
         const coursesWithStaticData = response.data.map(course => ({
           ...course,
@@ -98,45 +99,53 @@ const MyCoursesScreen = ({ navigation }) => {
         setLoading(false);
       }
     };
-  
+
     fetchCourses();
   }, []);
 
-  const renderCourseCard = ({ item, navigations }) => (
-    <View style={styles.courseCard}>
-      <View style={styles.courseImagePlaceholder} />
-      <View style={styles.courseContent}>
-        <Text style={styles.courseCategory}>{item.category}</Text>
-        <Text style={styles.courseTitle} numberOfLines={1}>
-          {item?.title}
-        </Text>
-        <View style={styles.courseMeta}>
-          <Icon name='star' size={16} color='#FFC107' />
-          <Text style={styles.courseRating}>{item.rating}</Text>
-          <Text style={styles.courseDuration}>| {item.duration}</Text>
+  const renderCourseCard = ({ item, navigations }) => {
+    console.log("image url is: ", item?.mediaUrl);
+    const abcd = item?.mediaUrl;
+  
+    return (
+      <View style={styles.courseCard}>
+        <Image
+          source={{ uri: abcd }}
+          style={styles.courseImagePlaceholder}
+        />
+        <View style={styles.courseContent}>
+          <Text style={styles.courseCategory}>{item.category}</Text>
+          <Text style={styles.courseTitle} numberOfLines={1}>
+            {item?.title}
+          </Text>
+          <View style={styles.courseMeta}>
+            <Icon name='star' size={16} color='#FFC107' />
+            <Text style={styles.courseRating}>{item.rating}</Text>
+            <Text style={styles.courseDuration}>| {item.duration}</Text>
+          </View>
+          {activeTab === 'Completed' && item.certificate && (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('CourseDetailsScreen')
+              }}>
+              <Text style={styles.certificateText}>VIEW CERTIFICATE</Text>
+            </TouchableOpacity>
+          )}
         </View>
-        {activeTab === 'Completed' && item.certificate && (
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('CourseDetailsScreen')
-            }}>
-            <Text style={styles.certificateText}>VIEW CERTIFICATE</Text>
-          </TouchableOpacity>
+        {activeTab === 'Completed' && (
+          <View style={styles.completionBadge}>
+            <Icon name='check' size={18} color='#FFFFFF' />
+          </View>
         )}
       </View>
-      {activeTab === 'Completed' && (
-        <View style={styles.completionBadge}>
-          <Icon name='check' size={18} color='#FFFFFF' />
-        </View>
-      )}
-    </View>
-  )
+    );
+  };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Coursess</Text>
+        <Text style={styles.headerTitle}>My Courses</Text>
       </View>
 
       {/* Search Bar */}

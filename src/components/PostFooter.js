@@ -1,15 +1,15 @@
-import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native'
-import React, {useState} from 'react'
-import Like from '../../public/images/like.jpeg'
-import {Colors} from '../utils/Colors'
-import VectorIcon from '../utils/VectorIcon'
-import {useNavigation} from '@react-navigation/native'
-import axios from 'axios'
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import Like from '../../public/images/like.jpeg';
+import { Colors } from '../utils/Colors';
+import VectorIcon from '../utils/VectorIcon';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
-const PostFooter = ({data}) => {
-  const navigation = useNavigation()
-  const [likesCount, setLikesCount] = useState(data?.likes?.length || 0)
-  const [liked, setLiked] = useState(false)
+const PostFooter = ({ data }) => {
+  const navigation = useNavigation();
+  const [likesCount, setLikesCount] = useState(data?.likes?.length || 0);
+  const [liked, setLiked] = useState(false);
 
   const handleLike = async () => {
     const config = {
@@ -17,29 +17,32 @@ const PostFooter = ({data}) => {
       maxBodyLength: Infinity,
       url: `https://education-backend-jade.vercel.app/api/posts/like/${data.id}`,
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ3cng5OHhlNkhxYlJVV1BzaGlTRUVWdmF4QzMyIiwiZW1haWwiOiJnb3ZpbmRzaGFybWEud2V2b2lzQGdtYWlsLmNvbSIsImlhdCI6MTczNjU5NjI4MiwiZXhwIjoxNzM2NjgyNjgyfQ.0Psvxvf8HXia8bjYHEYDXp2-Q3jI3kghFS2RAz2JfhA`,
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NjA4Mjc2LCJleHAiOjE3Mzc2OTQ2NzZ9.TGUxa0mKn3lwGT_IeupkijBtIFuP-Nwe31VX5URMEl4`,
       },
-    }
+    };
 
     try {
-      const response = await axios.request(config)
+      const response = await axios.request(config);
       if (response.data.message === 'Post liked') {
-        setLikesCount(likesCount + 1)
-        setLiked(true)
+        console.log("response:", response.data);
+        console.log('Post liked');
+        setLikesCount(likesCount + 1);
+        setLiked(true);
       } else if (response.data.message === 'Post unliked') {
-        setLikesCount(likesCount - 1)
-        setLiked(false)
+        setLikesCount(likesCount - 1);
+        setLiked(false);
       }
     } catch (error) {
-      console.error('Error liking/unliking post:', error)
+      console.error('Error liking/unliking post:', error);
     }
-  }
+  };
+
   return (
     <View style={styles.postFotterContainer}>
       <View style={styles.footerReactionSec}>
         <View style={styles.row}>
           <Image source={Like} style={styles.reactionIcon} />
-          <Text style={styles.reactionCount}>{data?.likes?.length}</Text>
+          <Text style={styles.reactionCount}>{likesCount}</Text>
         </View>
         <Text style={styles.reactionCount}>
           {data?.comments?.length} comments
@@ -51,7 +54,8 @@ const PostFooter = ({data}) => {
             name='like2'
             type='AntDesign'
             size={25}
-            color={Colors.grey}
+            color={liked ? Colors.blue : Colors.grey} // Change color based on liked state
+            
           />
           <Text style={styles.reactionCount}>{liked ? 'UnLike' : 'Like'}</Text>
         </TouchableOpacity>
@@ -65,9 +69,9 @@ const PostFooter = ({data}) => {
           <Text
             style={styles.reactionCount}
             onPress={() => {
-              navigation.navigate('CommentScreen',{
-                data: data
-              })
+              navigation.navigate('CommentScreen', {
+                data: data,
+              });
             }}>
             Comment
           </Text>
@@ -84,8 +88,8 @@ const PostFooter = ({data}) => {
         </View>
       </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   reactionIcon: {
@@ -117,6 +121,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
-})
+});
 
-export default PostFooter
+export default PostFooter;

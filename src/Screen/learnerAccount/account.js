@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,13 @@ import {
 } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useNavigation} from '@react-navigation/native'
+import axios from 'axios';
 
 const ProfileScreen = () => {
   const navigation = useNavigation()
+  const [userData, setUserData] = useState({ name: "", avatar: "" });
+  const [loading, setLoading] = useState(true);
+
   const menuOptions = [
     {
       id: '1',
@@ -62,6 +66,33 @@ const ProfileScreen = () => {
       route: 'Contact',
     },
   ]
+  useEffect(() => {
+    const fetchData = async () => {
+      const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NjA4Mjc2LCJleHAiOjE3Mzc2OTQ2NzZ9.TGUxa0mKn3lwGT_IeupkijBtIFuP-Nwe31VX5URMEl4";
+      try {
+        const response = await axios.get(
+          "https://education-backend-jade.vercel.app/api/profile/getUser",
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+        console.log("userdata:", response);
+        setUserData({
+          name: response.data.displayName,
+          avatar: response.data.profileImage,
+          email: response.data.email,
+        });
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const renderMenuItem = ({item}) => (
     <TouchableOpacity
@@ -79,6 +110,10 @@ const ProfileScreen = () => {
       </View>
     </TouchableOpacity>
   )
+  const profileimageurl= userData.avatar
+  console.log("profileimageurl", profileimageurl);
+  // console.log("")
+  // console.log("profileemail", userData?.data.email);
 
   return (
     <View style={styles.container}>
@@ -94,15 +129,15 @@ const ProfileScreen = () => {
       <View style={styles.profileSection}>
         <View style={styles.profileImageContainer}>
           <Image
-            source={{uri: 'https://via.placeholder.com/100'}}
+            source={{uri: profileimageurl}}
             style={styles.profileImage}
           />
           <TouchableOpacity style={styles.editImageButton}>
             <Icon name='image-edit-outline' size={20} color='#0047FF' />
           </TouchableOpacity>
         </View>
-        <Text style={styles.profileName}>Alex</Text>
-        <Text style={styles.profileEmail}>hernandex.redial@gmail.ac.in</Text>
+        <Text style={styles.profileName}>{userData.name}</Text>
+        <Text style={styles.profileEmail}>{userData.email}</Text>
       </View>
 
       {/* Menu Options */}
@@ -168,6 +203,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#7D7D7D',
     marginTop: 4,
+    color: 'black',
   },
   menuList: {
     paddingHorizontal: 16,

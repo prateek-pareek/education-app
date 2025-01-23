@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   StyleSheet,
   Text,
@@ -15,16 +15,16 @@ import {
 } from 'react-native'
 import PostHeader from './PostHeader'
 import PostFooter from './PostFooter'
-import {PostData} from '../data/PostData'
+import { PostData } from '../data/PostData'
 import axios from 'axios'
 
-const CommentSection = ({route}) => {
+const CommentSection = ({ route }) => {
   const [comments, setComments] = useState([])
   const [inputText, setInputText] = useState('')
   const [editingCommentId, setEditingCommentId] = useState(null)
   const [replyTexts, setReplyTexts] = useState({})
   const [showAllReplies, setShowAllReplies] = useState({})
-  const {data} = route.params
+  const { data } = route.params
 
   const profilePictures = [
     'https://randomuser.me/api/portraits/men/1.jpg',
@@ -37,37 +37,54 @@ const CommentSection = ({route}) => {
     return profilePictures[Math.floor(Math.random() * profilePictures.length)]
   }
 
-  const handleAddComment = () => {
+
+
+  const handleAddComment = async () => {
     if (inputText.trim()) {
-      if (editingCommentId) {
-        setComments(prevComments =>
-          prevComments.map(comment =>
-            comment.id === editingCommentId
-              ? {...comment, text: inputText}
-              : comment,
-          ),
-        )
-        setEditingCommentId(null)
-      } else {
-        setComments([
-          ...comments,
-          {
-            id: Date.now().toString(),
-            text: inputText,
-            likes: 0,
-            replies: [],
-            profilePicture: getRandomProfilePicture(),
+      try {
+        const config = {
+          method: 'post',
+          url: `https://education-backend-jade.vercel.app/api/posts/comment/${data.id}`,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NjA4Mjc2LCJleHAiOjE3Mzc2OTQ2NzZ9.TGUxa0mKn3lwGT_IeupkijBtIFuP-Nwe31VX5URMEl4`,
           },
-        ])
+          data: { comment: { text: inputText } },
+        };
+
+        const response = await axios(config);
+        if (response.data.message === 'Comment added') {
+          setComments(prevComments => [
+            ...prevComments,
+            {
+              id: response.data.comment.id,
+              text: inputText,
+              likes: [],
+              replies: [],
+              profilePicture: getRandomProfilePicture(),
+              user: response.data.comment.user,
+              createdAt: response.data.comment.createdAt,
+            },
+          ]);
+          setInputText('');
+        } else {
+          Alert.alert('Error', 'Failed to add comment');
+        }
+      } catch (error) {
+        console.error('Error adding comment:', error);
+        Alert.alert('Error', 'Failed to add comment');
       }
-      setInputText('')
     }
-  }
+  };
+
+
+
+  
 
   const handleLikeComment = id => {
     setComments(prevComments =>
       prevComments.map(comment =>
-        comment.id === id ? {...comment, likes: comment.likes + 1} : comment,
+        comment.id === id ? { ...comment, likes: comment.likes + 1 } : comment,
       ),
     )
   }
@@ -77,7 +94,7 @@ const CommentSection = ({route}) => {
       'Delete Comment',
       'Are you sure you want to delete this comment?',
       [
-        {text: 'Cancel', style: 'cancel'},
+        { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete',
           style: 'destructive',
@@ -96,31 +113,86 @@ const CommentSection = ({route}) => {
   }
 
   const handleReplyTextChange = (id, text) => {
-    setReplyTexts(prev => ({...prev, [id]: text}))
+    setReplyTexts(prev => ({ ...prev, [id]: text }))
   }
 
-  const handleReplyToComment = (id, replyText) => {
-    if (replyText.trim()) {
+
+
+  const addReply = async (commentId, replyText) => {
+    if (!replyText || !replyText.trim()) {
+      console.error('Reply text cannot be empty.');
+      return;
+    }
+
+    try {
+      const response = await axios({
+        method: 'post',
+        url: `https://education-backend-jade.vercel.app/api/posts/replyToComment/${data.id}/${commentId}`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NjA4Mjc2LCJleHAiOjE3Mzc2OTQ2NzZ9.TGUxa0mKn3lwGT_IeupkijBtIFuP-Nwe31VX5URMEl4`,
+        },
+        data: {
+          reply: replyText,
+        },
+      });
+
+      console.log('addReply API Response:', response.data);
+
       setComments(prevComments =>
         prevComments.map(comment =>
-          comment.id === id
+          comment.id === commentId
             ? {
                 ...comment,
                 replies: [
                   ...comment.replies,
                   {
-                    id: Date.now().toString(),
+                    id: response.data.reply.id,
                     text: replyText,
-                    likes: 0,
+                    likes: [],
                     profilePicture: getRandomProfilePicture(),
+                    user: response.data.reply.user,
+                    createdAt: response.data.reply.createdAt,
                   },
                 ],
               }
             : comment,
         ),
-      )
+      );
+    } catch (error) {
+      console.error('Error adding reply or fetching updated comments:', error.response?.data || error.message);
     }
-  }
+  };
+
+  const handleReplyToComment = (id, replyText) => {
+    if (replyText.trim()) {
+      addReply(id, replyText);
+      handleReplyTextChange(id, ''); // Clear input after posting
+    }
+  };
+
+  // const handleReplyToComment = (id, replyText) => {
+  //   if (replyText.trim()) {
+  //     setComments(prevComments =>
+  //       prevComments.map(comment =>
+  //         comment.id === id
+  //           ? {
+  //             ...comment,
+  //             replies: [
+  //               ...comment.replies,
+  //               {
+  //                 id: Date.now().toString(),
+  //                 text: replyText,
+  //                 likes: 0,
+  //                 profilePicture: getRandomProfilePicture(),
+  //               },
+  //             ],
+  //           }
+  //           : comment,
+  //       ),
+  //     )
+  //   }
+  // }
 
   const getComments = () => {
     let config = {
@@ -129,14 +201,15 @@ const CommentSection = ({route}) => {
       url: `https://education-backend-jade.vercel.app/api/posts/${data.id}/comment`,
       headers: {
         Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ3cng5OHhlNkhxYlJVV1BzaGlTRUVWdmF4QzMyIiwiZW1haWwiOiJnb3ZpbmRzaGFybWEud2V2b2lzQGdtYWlsLmNvbSIsImlhdCI6MTczNjU5NjI4MiwiZXhwIjoxNzM2NjgyNjgyfQ.0Psvxvf8HXia8bjYHEYDXp2-Q3jI3kghFS2RAz2JfhA',
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NjA4Mjc2LCJleHAiOjE3Mzc2OTQ2NzZ9.TGUxa0mKn3lwGT_IeupkijBtIFuP-Nwe31VX5URMEl4',
       },
     }
 
     axios
       .request(config)
       .then(response => {
-        console.log(JSON.stringify(response.data))
+        // console.log("response: ",JSON.stringify(response.data))
+        console.log("response: ",response.data)
         setComments(response.data)
       })
       .catch(error => {
@@ -145,28 +218,28 @@ const CommentSection = ({route}) => {
   }
   useEffect(() => {
     getComments()
-  })
+  },[])
 
-  const renderReply = ({item}) => (
+  const renderReply = ({ item }) => (
     <View style={styles.replyContainer}>
       <Image
-        source={{uri: item.profilePicture}}
+        source={{ uri: item.profilePicture }}
         style={styles.profilePicture}
       />
       <View style={styles.replyContent}>
-        <Text style={styles.commentText}>{item.text}</Text>
+        <Text style={styles.commentText}>{item?.text}</Text>
         <View style={styles.commentActions}>
           <TouchableOpacity
             onPress={() => handleLikeComment(item.id)}
             style={styles.likeButton}>
-            <Text style={styles.likeText}>👍 {item.likes}</Text>
+            <Text style={styles.likeText}>👍 {item?.likes}</Text>
           </TouchableOpacity>
         </View>
       </View>
     </View>
   )
 
-  const renderComment = ({item}) => {
+  const renderComment = ({ item }) => {
     const showReplies = showAllReplies[item.id] || false
     const visibleReplies = showReplies
       ? item?.replies
@@ -175,11 +248,11 @@ const CommentSection = ({route}) => {
     return (
       <View style={styles.commentContainer}>
         <Image
-          source={{uri: item.profilePicture}}
+          source={{ uri: item.profilePicture }}
           style={styles.profilePicture}
         />
         <View style={styles.commentContent}>
-          <Text style={styles.commentText}>{item?.comment.text}</Text>
+          <Text style={styles.commentText}>{item?.comment?.text}</Text>
           <View style={styles.commentActions}>
             <TouchableOpacity
               onPress={() => handleLikeComment(item?.id)}
@@ -241,7 +314,7 @@ const CommentSection = ({route}) => {
 
   return (
     <KeyboardAvoidingView
-      style={{flex: 1}}
+      style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
@@ -249,7 +322,7 @@ const CommentSection = ({route}) => {
             ListHeaderComponent={() => (
               <>
                 <PostHeader data={data} />
-                <Image source={{uri: data?.mediaUrl}} style={styles.postImg} />
+                <Image source={{ uri: data?.mediaUrl }} style={styles.postImg} />
                 <PostFooter data={data} />
               </>
             )}
@@ -386,7 +459,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderTopWidth: 1,
     borderColor: '#ddd',
-    position: 'absolute',
+    // position: 'absolute',
     bottom: 0,
     width: '100%',
   },
