@@ -17,6 +17,7 @@ import PostHeader from './PostHeader'
 import PostFooter from './PostFooter'
 import { PostData } from '../data/PostData'
 import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const CommentSection = ({ route }) => {
   const [comments, setComments] = useState([])
@@ -40,6 +41,8 @@ const CommentSection = ({ route }) => {
 
 
   const handleAddComment = async () => {
+    const auth= await AsyncStorage.getItem('authToken')
+
     if (inputText.trim()) {
       try {
         const config = {
@@ -47,7 +50,7 @@ const CommentSection = ({ route }) => {
           url: `https://education-backend-jade.vercel.app/api/posts/comment/${data.id}`,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NjA4Mjc2LCJleHAiOjE3Mzc2OTQ2NzZ9.TGUxa0mKn3lwGT_IeupkijBtIFuP-Nwe31VX5URMEl4`,
+            Authorization: `Bearer ${auth}`,
           },
           data: { comment: { text: inputText } },
         };
@@ -193,29 +196,54 @@ const CommentSection = ({ route }) => {
   //     )
   //   }
   // }
+  
 
-  const getComments = () => {
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: `https://education-backend-jade.vercel.app/api/posts/${data.id}/comment`,
-      headers: {
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ6WkdPakhkTmJQVDcyUEJYdlRxY0ZoZ0RrT1AyIiwiZW1haWwiOiJhbnVqdGl3YXJpMzExMzVAZ21haWwuY29tIiwiaWF0IjoxNzM3NjA4Mjc2LCJleHAiOjE3Mzc2OTQ2NzZ9.TGUxa0mKn3lwGT_IeupkijBtIFuP-Nwe31VX5URMEl4',
-      },
+
+  const getComments = async () => {
+    const auth= await AsyncStorage.getItem('authToken')
+    try {
+      if (!auth) {
+        console.error("Authentication token is missing");
+        return;
+      }
+      
+      if (!data || !data.id) {
+        console.error("Post ID is missing");
+        return;
+      }
+      let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `https://education-backend-jade.vercel.app/api/posts/${data.id}/comment`,
+        headers: {
+          Authorization: `Bearer ${auth}`
+        }
+      };
+  
+      let response = await axios(config);
+  
+      if (response?.data) {
+        console.log("Comments fetched: ", response.data);
+        setComments(response.data);
+      } else {
+        console.warn("No comments found.");
+        setComments([]); // Ensure state is updated with an empty array if no comments exist
+      }
+  
+      // const response = await axios.get(
+      //   `https://education-backend-jade.vercel.app/api/posts/${data.id}/comment`,
+      //   {
+      //     headers: { Authorization: `Bearer ${auth}` },
+      //     maxBodyLength: Infinity,
+      //   }
+      // );
+  
+    
+    } catch (error) {
+      console.error("Error fetching comments:", error.response?.data || error.message);
     }
-
-    axios
-      .request(config)
-      .then(response => {
-        // console.log("response: ",JSON.stringify(response.data))
-        console.log("response: ",response.data)
-        setComments(response.data)
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }
+  };
+  
   useEffect(() => {
     getComments()
   },[])
